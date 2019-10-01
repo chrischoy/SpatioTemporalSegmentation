@@ -8,27 +8,13 @@ import scipy.interpolate
 import torch
 
 
-class RandomHorizontalFlip(object):
-
-  def __init__(self, upright_axis, is_temporal):
-    """
-    upright_axis: axis index among x,y,z, i.e. 2 for z
-    """
-    self.is_temporal = is_temporal
-    self.D = 4 if is_temporal else 3
-    self.upright_axis = {'x': 0, 'y': 1, 'z': 2}[upright_axis.lower()]
-    # Use the rest of axes for flipping.
-    self.horz_axes = set(range(self.D)) - set([self.upright_axis])
-
-  def __call__(self, coords, feats, labels):
-    if random.random() < 0.95:
-      for curr_ax in self.horz_axes:
-        if random.random() < 0.5:
-          coord_max = np.max(coords[:, curr_ax])
-          coords[:, curr_ax] = coord_max - coords[:, curr_ax]
-    return coords, feats, labels
-
-
+# A sparse tensor consists of coordinates and associated features.
+# You must apply augmentation to both.
+# In 2D, flip, shear, scale, and rotation of images are coordinate transformation
+# color jitter, hue, etc., are feature transformations
+##############################
+# Feature transformations
+##############################
 class ChromaticTranslation(object):
   """Add random color to the image, input must be an array in [0,255] or a PIL image"""
 
@@ -146,38 +132,74 @@ class HueSaturationTranslation(object):
     return coords, feats, labels
 
 
-class HeightTranslation(object):
+##############################
+# Coordinate transformations
+##############################
+class RandomHorizontalFlip(object):
 
-  def __init__(self, std=0.01):
-    self.std = std
+  def __init__(self, upright_axis, is_temporal):
+    """
+    upright_axis: axis index among x,y,z, i.e. 2 for z
+    """
+    self.is_temporal = is_temporal
+    self.D = 4 if is_temporal else 3
+    self.upright_axis = {'x': 0, 'y': 1, 'z': 2}[upright_axis.lower()]
+    # Use the rest of axes for flipping.
+    self.horz_axes = set(range(self.D)) - set([self.upright_axis])
 
   def __call__(self, coords, feats, labels):
-    if feats.shape[1] > 3 and random.random() < 0.95:
-      feats[:, -1] += np.random.randn(1) * self.std
+    if random.random() < 0.95:
+      for curr_ax in self.horz_axes:
+        if random.random() < 0.5:
+          coord_max = np.max(coords[:, curr_ax])
+          coords[:, curr_ax] = coord_max - coords[:, curr_ax]
     return coords, feats, labels
 
 
-class HeightJitter(object):
+class ElasticDistortion:
 
-  def __init__(self, std):
-    self.std = std
+  def __init__(self, distortion_params):
+    self.distortion_params = distortion_params
 
-  def __call__(self, coords, feats, labels):
-    if feats.shape[1] > 3 and random.random() < 0.95:
-      feats[:, -1] += np.random.randn(feats.shape[0]) * self.std
-    return coords, feats, labels
+  def elastic_distortion(self, pointcloud, granularity, magnitude):
+    """Apply elastic distortion on sparse coordinate space.
 
+      pointcloud: numpy array of (number of points, at least 3 spatial dims)
+      granularity: size of the noise grid (in same scale[m/cm] as the voxel grid)
+      magnitude: noise multiplier
+    """
+    blurx = np.ones((3, 1, 1, 1)).astype('float32') / 3
+    blury = np.ones((1, 3, 1, 1)).astype('float32') / 3
+    blurz = np.ones((1, 1, 3, 1)).astype('float32') / 3
+    coords = pointcloud[:, :3]
+    coords_min = coords.min(0)
 
-class NormalJitter(object):
+    # Create Gaussian noise tensor of the size given by granularity.
+    noise_dim = ((coords - coords_min).max(0) // granularity).astype(int) + 3
+    noise = np.random.randn(*noise_dim, 3).astype(np.float32)
 
-  def __init__(self, std):
-    self.std = std
+    # Smoothing.
+    for _ in range(2):
+      noise = scipy.ndimage.filters.convolve(noise, blurx, mode='constant', cval=0)
+      noise = scipy.ndimage.filters.convolve(noise, blury, mode='constant', cval=0)
+      noise = scipy.ndimage.filters.convolve(noise, blurz, mode='constant', cval=0)
 
-  def __call__(self, coords, feats, labels):
-    # normal jitter
-    if feats.shape[1] > 6 and random.random() < 0.95:
-      feats[:, 3:6] += np.random.randn(feats.shape[0], 3) * self.std
-    return coords, feats, labels
+    # Trilinear interpolate noise filters for each spatial dimensions.
+    ax = [
+        np.linspace(d_min, d_max, d)
+        for d_min, d_max, d in zip(coords_min - granularity, coords_min +
+                                   granularity * (noise_dim - 2), noise_dim)
+    ]
+    interp = scipy.interpolate.RegularGridInterpolator(ax, noise, bounds_error=0, fill_value=0)
+    pointcloud[:, :3] = coords + interp(coords) * magnitude
+    return pointcloud
+
+  def __call__(self, pointcloud):
+    if self.distortion_param is not None:
+      if random.random() < 0.95:
+        for granularity, magnitude in self.distortion_param:
+          pointcloud = self.elastic_distortion(pointcloud, granularity, magnitude)
+    return pointcloud
 
 
 class Compose(object):
@@ -221,8 +243,8 @@ class cfl_collate_fn_factory:
         )
         break
       coords_batch.append(
-          torch.cat((torch.from_numpy(
-              coords[batch_id]).int(), torch.ones(num_points, 1).int() * batch_id), 1))
+          torch.cat((torch.from_numpy(coords[batch_id]).int(),
+                     torch.ones(num_points, 1).int() * batch_id), 1))
       feats_batch.append(torch.from_numpy(feats[batch_id]))
       labels_batch.append(torch.from_numpy(labels[batch_id]).int())
 
@@ -269,37 +291,3 @@ class cflt_collate_fn_factory:
     pointclouds_batch = torch.cat(pointclouds_batch, 0).float()
     transformations_batch = torch.cat(transformations_batch, 0).float()
     return coords_batch, feats_batch, labels_batch, pointclouds_batch, transformations_batch
-
-
-def elastic_distortion(pointcloud, granularity, magnitude):
-  """Apply elastic distortion on sparse coordinate space.
-
-    pointcloud: numpy array of (number of points, at least 3 spatial dims)
-    granularity: size of the noise grid (in same scale[m/cm] as the voxel grid)
-    magnitude: noise multiplier
-  """
-  blurx = np.ones((3, 1, 1, 1)).astype('float32') / 3
-  blury = np.ones((1, 3, 1, 1)).astype('float32') / 3
-  blurz = np.ones((1, 1, 3, 1)).astype('float32') / 3
-  coords = pointcloud[:, :3]
-  coords_min = coords.min(0)
-
-  # Create Gaussian noise tensor of the size given by granularity.
-  noise_dim = ((coords - coords_min).max(0) // granularity).astype(int) + 3
-  noise = np.random.randn(*noise_dim, 3).astype(np.float32)
-
-  # Smoothing.
-  for _ in range(2):
-    noise = scipy.ndimage.filters.convolve(noise, blurx, mode='constant', cval=0)
-    noise = scipy.ndimage.filters.convolve(noise, blury, mode='constant', cval=0)
-    noise = scipy.ndimage.filters.convolve(noise, blurz, mode='constant', cval=0)
-
-  # Trilinear interpolate noise filters for each spatial dimensions.
-  ax = [
-      np.linspace(d_min, d_max, d)
-      for d_min, d_max, d in zip(coords_min - granularity, coords_min + granularity *
-                                 (noise_dim - 2), noise_dim)
-  ]
-  interp = scipy.interpolate.RegularGridInterpolator(ax, noise, bounds_error=0, fill_value=0)
-  pointcloud[:, :3] = coords + interp(coords) * magnitude
-  return pointcloud

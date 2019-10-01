@@ -12,7 +12,7 @@ from sklearn.preprocessing import label_binarize
 
 from lib.utils import Timer, AverageMeter, precision_at_one, fast_hist, per_class_iu, \
     get_prediction, get_torch_device, save_predictions, visualize_results, \
-    evaluate_temporal_average, permute_pointcloud, save_rotation_pred
+    permute_pointcloud, save_rotation_pred
 
 from MinkowskiEngine import SparseTensor
 
@@ -115,9 +115,6 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
       inputs = (sinput,) if config.wrapper_type == 'None' else (sinput, coords, color)
       soutput = model(*inputs)
       output = soutput.F
-
-      if config.test_temporal_average:
-        evaluate_temporal_average(output, coords)
 
       pred = get_prediction(dataset, output, target).int()
       iter_time = iter_timer.toc(False)
@@ -228,9 +225,5 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
       shutil.rmtree(save_pred_dir)
 
   logging.info("Finished test. Elapsed time: {:.4f}".format(global_time))
-
-  # Explicit memory cleanup
-  if hasattr(data_iter, 'cleanup'):
-    data_iter.cleanup()
 
   return losses.avg, scores.avg, np.nanmean(ap_class), np.nanmean(per_class_iu(hist)) * 100
