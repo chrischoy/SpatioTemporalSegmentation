@@ -1,6 +1,5 @@
 import random
 from torch.nn import Module
-from models.model import NetworkType
 
 from MinkowskiEngine import SparseTensor
 
@@ -10,7 +9,6 @@ class Wrapper(Module):
   Wrapper for the segmentation networks.
   """
   OUT_PIXEL_DIST = -1
-  NETWORK_TYPE = NetworkType.SEGMENTATION
 
   def __init__(self, NetClass, in_nchannel, out_nchannel, config):
     super(Wrapper, self).__init__()

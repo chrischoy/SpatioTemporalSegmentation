@@ -2,7 +2,7 @@ import torch.nn as nn
 
 import MinkowskiEngine as ME
 
-from models.model import Model, NetworkType
+from models.model import Model
 from models.modules.common import ConvType, NormType, get_norm, conv, sum_pool
 from models.modules.resnet_block import BasicBlock, Bottleneck
 
@@ -72,19 +72,8 @@ class ResNetBase(Model):
         stride=space_n_time_m(2, 1),
         dilation=space_n_time_m(dilations[3], 1))
 
-    if self.NETWORK_TYPE == NetworkType.CLASSIFICATION:
-      self.glob_avg = ME.MinkowskiGlobalPooling(dimension=D)
-      if self.HAS_LAST_BLOCK:
-        self.final1 = nn.Linear(self.inplanes, self.inplanes, bias=False)
-        self.bnfinal1 = nn.BatchNorm1d(self.inplanes)
-
-        self.final2 = nn.Linear(self.inplanes, self.inplanes, bias=False)
-        self.bnfinal2 = nn.BatchNorm1d(self.inplanes)
-
-      self.final = nn.Linear(self.inplanes, out_channels, bias=True)
-    else:
-      self.final = conv(
-          self.PLANES[3] * self.BLOCK.expansion, out_channels, kernel_size=1, bias=True, D=D)
+    self.final = conv(
+        self.PLANES[3] * self.BLOCK.expansion, out_channels, kernel_size=1, bias=True, D=D)
 
   def weight_initialization(self):
     for m in self.modules():
@@ -145,20 +134,6 @@ class ResNetBase(Model):
     x = self.layer2(x)
     x = self.layer3(x)
     x = self.layer4(x)
-
-    if self.NETWORK_TYPE == NetworkType.CLASSIFICATION:
-      if self.HAS_LAST_BLOCK:
-        res = self.glob_avg(x)
-        x = self.final1(res)
-        x = self.bnfinal1(x)
-        x = self.relu(x)
-
-        x = self.final2(x)
-        x = self.bnfinal2(x)
-        x += res
-        x = self.relu(x)
-      else:
-        x = self.glob_avg(x)
 
     x = self.final(x)
     return x
@@ -239,128 +214,3 @@ class STResTesseractNet50(STResTesseractNetBase, STResNet50):
 
 class STResTesseractNet101(STResTesseractNetBase, STResNet101):
   pass
-
-
-# Classification networks
-class ResClassificationNetBase(ResNetBase):
-  NETWORK_TYPE = NetworkType.CLASSIFICATION
-
-
-class ResClassificationNet14(ResNet14, ResClassificationNetBase):
-  pass
-
-
-class ResClassificationNet18(ResNet18, ResClassificationNetBase):
-  pass
-
-
-class ResClassificationNet34(ResNet34, ResClassificationNetBase):
-  pass
-
-
-class ResClassificationNet50(ResNet50, ResClassificationNetBase):
-  pass
-
-
-class ResClassificationNet101(ResNet101, ResClassificationNetBase):
-  pass
-
-
-class STResClassificationNet14(STResNetBase, ResClassificationNet14):
-  pass
-
-
-class STResClassificationNet18(STResNetBase, ResClassificationNet18):
-  pass
-
-
-class STResClassificationNet34(STResNetBase, ResClassificationNet34):
-  pass
-
-
-class STResClassificationNet50(STResNetBase, ResClassificationNet50):
-  pass
-
-
-class STResClassificationNet101(STResNetBase, ResClassificationNet101):
-  pass
-
-
-class STResTesseractClassificationNet14(STResTesseractNetBase, STResClassificationNet14):
-  pass
-
-
-class STResTesseractClassificationNet18(STResTesseractNetBase, STResClassificationNet18):
-  pass
-
-
-class STResTesseractClassificationNet34(STResTesseractNetBase, STResClassificationNet34):
-  pass
-
-
-class STResTesseractClassificationNet50(STResTesseractNetBase, STResClassificationNet50):
-  pass
-
-
-class STResTesseractClassificationNet101(STResTesseractNetBase, STResClassificationNet101):
-  pass
-
-
-class ResClassificationNetLB14(ResClassificationNet14):
-  HAS_LAST_BLOCK = True
-
-
-class ResClassificationNetLB18(ResClassificationNet18):
-  HAS_LAST_BLOCK = True
-
-
-class ResClassificationNetLB34(ResClassificationNet34):
-  HAS_LAST_BLOCK = True
-
-
-class ResClassificationNetLB50(ResClassificationNet50):
-  HAS_LAST_BLOCK = True
-
-
-class ResClassificationNetLB101(ResClassificationNet101):
-  HAS_LAST_BLOCK = True
-
-
-class STResClassificationNetLB14(STResClassificationNet14):
-  HAS_LAST_BLOCK = True
-
-
-class STResClassificationNetLB18(STResClassificationNet18):
-  HAS_LAST_BLOCK = True
-
-
-class STResClassificationNetLB34(STResClassificationNet34):
-  HAS_LAST_BLOCK = True
-
-
-class STResClassificationNetLB50(STResClassificationNet50):
-  HAS_LAST_BLOCK = True
-
-
-class STResClassificationNetLB101(STResClassificationNet101):
-  HAS_LAST_BLOCK = True
-
-
-class STResTesseractClassificationNetLB14(STResTesseractClassificationNet14):
-  HAS_LAST_BLOCK = True
-
-
-class STResTesseractClassificationNetLB18(STResTesseractClassificationNet18):
-  HAS_LAST_BLOCK = True
-
-
-class STResTesseractClassificationNetLB34(STResTesseractClassificationNet34):
-  HAS_LAST_BLOCK = True
-
-
-class STResTesseractClassificationNetLB50(STResTesseractClassificationNet50):
-  HAS_LAST_BLOCK = True
-
-
-class STResTesseractClassificationNetLB101(STResTesseractClassificationNet101):
-  HAS_LAST_BLOCK = True
