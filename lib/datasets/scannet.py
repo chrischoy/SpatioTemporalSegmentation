@@ -87,6 +87,7 @@ class ScannetVoxelizationDataset(VoxelizationDataset):
 
   def __init__(self,
                config,
+               prevoxel_transform=None,
                input_transform=None,
                target_transform=None,
                augment_data=True,

@@ -132,6 +132,7 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
 
   def __init__(self,
                config,
+               prevoxel_transform=None,
                input_transform=None,
                target_transform=None,
                augment_data=True,
@@ -179,6 +180,7 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
 
   def __init__(self,
                config,
+               prevoxel_transform=None,
                input_transform=None,
                target_transform=None,
                augment_data=True,
