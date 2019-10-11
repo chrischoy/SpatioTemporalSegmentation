@@ -107,8 +107,6 @@ data_arg.add_argument(
     '--threads', type=int, default=1, help='num threads for train/test dataloader')
 data_arg.add_argument('--val_threads', type=int, default=1, help='num threads for val dataloader')
 data_arg.add_argument('--ignore_label', type=int, default=255)
-data_arg.add_argument('--train_elastic_distortion', type=str2bool, default=True)
-data_arg.add_argument('--test_elastic_distortion', type=str2bool, default=False)
 data_arg.add_argument('--return_transformation', type=str2bool, default=False)
 data_arg.add_argument('--ignore_duplicate_class', type=str2bool, default=False)
 data_arg.add_argument('--partial_crop', type=float, default=0.)
@@ -198,15 +196,16 @@ data_aug_arg.add_argument(
 data_aug_arg.add_argument('--normalize_color', type=str2bool, default=True)
 data_aug_arg.add_argument('--data_aug_scale_min', type=float, default=0.9)
 data_aug_arg.add_argument('--data_aug_scale_max', type=float, default=1.1)
+data_aug_arg.add_argument(
+    '--data_aug_hue_max', type=float, default=0.5, help='Hue translation range. [0, 1]')
+data_aug_arg.add_argument(
+    '--data_aug_saturation_max', type=float, default=0.20, help='Saturation translation range, [0, 1]')
 
 # Test
 test_arg = add_argument_group('Test')
 test_arg.add_argument('--visualize', type=str2bool, default=False)
 test_arg.add_argument('--test_temporal_average', type=str2bool, default=False)
 test_arg.add_argument('--visualize_path', type=str, default='outputs/visualize')
-test_arg.add_argument('--test_rotation', type=int, default=-1)
-test_arg.add_argument('--test_rotation_save', type=str2bool, default=False)
-test_arg.add_argument('--test_rotation_save_dir', type=str, default='outputs/rotation_fulleval')
 test_arg.add_argument('--save_prediction', type=str2bool, default=False)
 test_arg.add_argument('--save_pred_dir', type=str, default='outputs/pred')
 test_arg.add_argument('--test_phase', type=str, default='test', help='Dataset for test')

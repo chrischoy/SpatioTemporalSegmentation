@@ -76,6 +76,7 @@ class DictDataset(Dataset, ABC):
 
   def __init__(self,
                data_paths,
+               prevoxel_transform=None,
                input_transform=None,
                target_transform=None,
                cache=False,
@@ -91,6 +92,8 @@ class DictDataset(Dataset, ABC):
 
     self.data_root = data_root
     self.data_paths = sorted(data_paths)
+
+    self.prevoxel_transform = prevoxel_transform
     self.input_transform = input_transform
     self.target_transform = target_transform
 
@@ -141,28 +144,27 @@ class VoxelizationDatasetBase(DictDataset, ABC):
 
   def __init__(self,
                data_paths,
+               prevoxel_transform=None,
                input_transform=None,
                target_transform=None,
                cache=False,
                data_root='/',
-               explicit_rotation=-1,
                ignore_mask=255,
                return_transformation=False,
                **kwargs):
     """
     ignore_mask: label value for ignore class. It will not be used as a class in the loss or evaluation.
-    explicit_rotation: # of discretization of 360 degree. # data would be num_data * explicit_rotation
     """
     DictDataset.__init__(
         self,
         data_paths,
+        prevoxel_transform=prevoxel_transform,
         input_transform=input_transform,
         target_transform=target_transform,
         cache=cache,
         data_root=data_root)
 
     self.ignore_mask = ignore_mask
-    self.explicit_rotation = explicit_rotation
     self.return_transformation = return_transformation
 
   def __getitem__(self, index):
@@ -174,8 +176,6 @@ class VoxelizationDatasetBase(DictDataset, ABC):
 
   def __len__(self):
     num_data = len(self.data_paths)
-    if self.explicit_rotation > 1:
-      return num_data * self.explicit_rotation
     return num_data
 
 
@@ -202,7 +202,6 @@ class VoxelizationDataset(VoxelizationDatasetBase):
                input_transform=None,
                target_transform=None,
                data_root='/',
-               explicit_rotation=-1,
                ignore_label=255,
                return_transformation=False,
                augment_data=False,
@@ -214,11 +213,11 @@ class VoxelizationDataset(VoxelizationDatasetBase):
     VoxelizationDatasetBase.__init__(
         self,
         data_paths,
+        prevoxel_transform=prevoxel_transform,
         input_transform=input_transform,
         target_transform=target_transform,
         cache=cache,
         data_root=data_root,
-        explicit_rotation=config.test_rotation,
         ignore_mask=ignore_label,
         return_transformation=return_transformation)
 
@@ -250,13 +249,6 @@ class VoxelizationDataset(VoxelizationDatasetBase):
     return mat[:, :3], mat[:, 3:-1], mat[:, -1]
 
   def __getitem__(self, index):
-    if self.explicit_rotation > 1:
-      rotation_space = np.linspace(-np.pi, np.pi, self.explicit_rotation + 1)
-      rotation_angle = rotation_space[index % self.explicit_rotation]
-      index //= self.explicit_rotation
-    else:
-      rotation_angle = None
-
     pointcloud, center = self.load_ply(index)
 
     # Downsample the pointcloud with finer voxel size before transformation for memory and speed
@@ -269,19 +261,8 @@ class VoxelizationDataset(VoxelizationDatasetBase):
     pointcloud = self.prevoxel_transform(pointcloud)
 
     coords, feats, labels = self.convert_mat2cfl(pointcloud)
-    outs = self.voxelizer.voxelize(
-        coords,
-        feats,
-        labels,
-        center=center,
-        rotation_angle=rotation_angle,
-        return_transformation=self.return_transformation)
-
-    if self.return_transformation:
-      coords, feats, labels, transformation = outs
-      transformation = np.expand_dims(transformation, 0)
-    else:
-      coords, feats, labels = outs
+    coords, feats, labels, transformation = self.voxelizer.voxelize(
+        coords, feats, labels, center=center)
 
     # map labels not used for evaluation to ignore_label
     if self.input_transform is not None:
@@ -296,12 +277,6 @@ class VoxelizationDataset(VoxelizationDatasetBase):
       return_args.extend([pointcloud.astype(np.float32), transformation.astype(np.float32)])
     return tuple(return_args)
 
-  def __len__(self):
-    num_data = sum(self.numels)
-    if self.explicit_rotation > 1:
-      return num_data * self.explicit_rotation
-    return num_data
-
 
 class TemporalVoxelizationDataset(VoxelizationDataset):
 
@@ -313,7 +288,6 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
                input_transform=None,
                target_transform=None,
                data_root='/',
-               explicit_rotation=-1,
                ignore_label=255,
                temporal_dilation=1,
                temporal_numseq=3,
@@ -322,8 +296,8 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
                config=None,
                **kwargs):
     VoxelizationDataset.__init__(self, data_paths, input_transform, target_transform, data_root,
-                                 explicit_rotation, ignore_label, return_transformation,
-                                 augment_data, config, **kwargs)
+                                 ignore_label, return_transformation, augment_data, config,
+                                 **kwargs)
     self.temporal_dilation = temporal_dilation
     self.temporal_numseq = temporal_numseq
     temporal_window = temporal_dilation * (temporal_numseq - 1) + 1
@@ -405,6 +379,10 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
 
       return_args.extend([pointclouds.astype(np.float32), transformations.astype(np.float32)])
     return tuple(return_args)
+
+  def __len__(self):
+    num_data = sum(self.numels)
+    return num_data
 
 
 def initialize_data_loader(DatasetClass,

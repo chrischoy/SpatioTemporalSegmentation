@@ -105,6 +105,7 @@ class ScannetVoxelizationDataset(VoxelizationDataset):
     super().__init__(
         data_paths,
         data_root=data_root,
+        prevoxel_transform=prevoxel_transform,
         input_transform=input_transform,
         target_transform=target_transform,
         ignore_label=config.ignore_label,

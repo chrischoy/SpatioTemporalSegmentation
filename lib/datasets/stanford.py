@@ -8,7 +8,6 @@ from scipy import spatial
 from lib.utils import read_txt, fast_hist, per_class_iu
 from lib.dataset import VoxelizationDataset, DatasetPhase, str2datasetphase_type
 import lib.transforms as t
-from lib.datasets.preprocessing.stanford_3d import Stanford3DDatasetConverter
 
 
 class StanfordVoxelizationDatasetBase:
@@ -69,8 +68,7 @@ class StanfordVoxelizationDatasetBase:
       ious = []
       print('Per class IoU:')
       for i, iou in enumerate(per_class_iu(hist) * 100):
-        unmasked_idx = self.label2masked.tolist().index(i)
-        result_str = f'\t{Stanford3DDatasetConverter.CLASSES[unmasked_idx]}:\t'
+        result_str = ''
         if hist.sum(1)[i]:
           result_str += f'{iou}'
           ious.append(iou)

@@ -195,9 +195,9 @@ class ElasticDistortion:
     return pointcloud
 
   def __call__(self, pointcloud):
-    if self.distortion_param is not None:
+    if self.distortion_params is not None:
       if random.random() < 0.95:
-        for granularity, magnitude in self.distortion_param:
+        for granularity, magnitude in self.distortion_params:
           pointcloud = self.elastic_distortion(pointcloud, granularity, magnitude)
     return pointcloud
 

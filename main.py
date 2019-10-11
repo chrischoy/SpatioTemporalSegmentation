@@ -58,14 +58,9 @@ def main():
     if not config.return_transformation:
       raise ValueError('Pointcloud evaluation requires config.return_transformation=true.')
 
-  if config.test_rotation > 1:
-    if config.is_train:
-      raise ValueError('Rotation evaluation should not be used for training.')
-    if not (config.return_transformation and config.evaluate_original_pointcloud):
-      raise ValueError('Rotation evaluation requires config.evaluate_original_pointcloud=true and '
-                       'config.return_transformation=true.')
-    if config.test_original_pointcloud:
-      raise ValueError('Cannot run rotation evaluation and KD-tree evaluation together.')
+  if (config.return_transformation ^ config.evaluate_original_pointcloud):
+    raise ValueError('Rotation evaluation requires config.evaluate_original_pointcloud=true and '
+                     'config.return_transformation=true.')
 
   logging.info('===> Initializing dataloader')
   if config.is_train:
@@ -75,7 +70,6 @@ def main():
         phase=config.train_phase,
         threads=config.threads,
         augment_data=True,
-        elastic_distortion=config.train_elastic_distortion,
         shuffle=True,
         repeat=True,
         batch_size=config.batch_size,
@@ -87,7 +81,6 @@ def main():
         threads=config.val_threads,
         phase=config.val_phase,
         augment_data=False,
-        elastic_distortion=config.test_elastic_distortion,
         shuffle=True,
         repeat=False,
         batch_size=config.val_batch_size,
@@ -105,7 +98,6 @@ def main():
         threads=config.threads,
         phase=config.test_phase,
         augment_data=False,
-        elastic_distortion=config.test_elastic_distortion,
         shuffle=False,
         repeat=False,
         batch_size=config.test_batch_size,

@@ -70,11 +70,6 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
   data_iter = data_loader.__iter__()
   max_iter = len(data_loader)
   max_iter_unique = max_iter
-  if config.test_rotation > 1:
-    if config.test_rotation_save:
-      logging.info('Saving rotation pointcloud prediction at ' + config.test_rotation_save_dir)
-      os.makedirs(config.test_rotation_save_dir, exist_ok=True)
-    max_iter_unique //= config.test_rotation
 
   # Fix batch normalization running mean and std
   model.eval()
@@ -106,7 +101,7 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
       iter_timer.tic()
 
       if config.wrapper_type != 'None':
-         color = input[:, :3].int()
+        color = input[:, :3].int()
       if config.normalize_color:
         input[:, :3] = input[:, :3] / 255. - 0.5
       sinput = SparseTensor(input, coords).to(device)
@@ -119,45 +114,13 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
       pred = get_prediction(dataset, output, target).int()
       iter_time = iter_timer.toc(False)
 
-      # Get mapping between input and output space
-      if np.prod(np.array(model.OUT_PIXEL_DIST)) > 1:
-        permutation = model.get_permutation(model.OUT_PIXEL_DIST, 1).long()
-        upsampled_pred = pred[permutation].cpu().numpy()
-      else:
-        upsampled_pred = pred.cpu().numpy()
-
       if config.save_prediction or config.test_original_pointcloud:
-        save_predictions(coords, upsampled_pred, transformation, dataset, config, iteration,
-                         save_pred_dir)
-
-      # Visualize prediction
-      if config.visualize:
-        # Do not save all predictions in rotation-augmented test.
-        if config.test_rotation < 1 or iteration % config.test_rotation == 0:
-          visualize_results(coords, input, target, upsampled_pred, config, iteration)
+        save_predictions(coords, pred, transformation, dataset, config, iteration, save_pred_dir)
 
       if has_gt:
-        if config.eval_upsample:
-          # Upscale the target and predication to the original voxel space
-          output = output[permutation]
-          pred = get_prediction(dataset, output, target).int()
-
         if config.evaluate_original_pointcloud:
           output, pred, target = permute_pointcloud(coords, pointcloud, transformation,
                                                     dataset.label_map, output, pred)
-          if config.test_rotation > 1:
-            if iteration % config.test_rotation == 0:
-              output_rotation = output
-            else:
-              output_rotation += output
-            if iteration % config.test_rotation != config.test_rotation - 1:
-              continue
-            iteration //= config.test_rotation
-            output = output_rotation
-            pred = get_prediction(dataset, output, target).int()
-            if config.test_rotation_save:
-              save_rotation_pred(iteration,
-                                 pred.cpu().numpy(), dataset, config.test_rotation_save_dir)
 
         target_np = target.numpy()
 
@@ -221,8 +184,6 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
   if config.test_original_pointcloud:
     logging.info('===> Start testing on original pointcloud space.')
     dataset.test_pointcloud(save_pred_dir)
-    if not config.save_prediction:
-      shutil.rmtree(save_pred_dir)
 
   logging.info("Finished test. Elapsed time: {:.4f}".format(global_time))
 

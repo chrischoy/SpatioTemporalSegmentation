@@ -197,10 +197,7 @@ def debug_on():
 
 
 def get_prediction(dataset, output, target):
-  if dataset.NEED_PRED_POSTPROCESSING:
-    return dataset.get_prediction(output, target)
-  else:
-    return output.max(1)[1]
+  return output.max(1)[1]
 
 
 def count_parameters(model):
