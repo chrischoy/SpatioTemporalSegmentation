@@ -113,43 +113,23 @@ data_arg.add_argument('--partial_crop', type=float, default=0.)
 data_arg.add_argument('--train_limit_numpoints', type=int, default=0)
 
 # Point Cloud Dataset
+
 data_arg.add_argument(
     '--synthia_path',
     type=str,
-    default='/cvgl/group/Synthia/synthia-processed/raw-pc-upright',
+    default='/home/chrischoy/datasets/synthia_preprocessed',
     help='Point Cloud dataset root dir')
-
-data_arg.add_argument(
-    '--synthia_online_path',
-    type=str,
-    default='/cvgl2/u/jgwak/Datasets/synthia_subsampled',
-    help='Synthia precropped dataset root dir')
 
 data_arg.add_argument(
     '--scannet_path',
     type=str,
-    default='/cvgl2/u/jgwak/Datasets/scannet',
+    default='/home/chrischoy/datasets/scannet/scannet_preprocessed',
     help='Scannet online voxelization dataset root dir')
 
 data_arg.add_argument(
-    '--scannet_ply_path',
-    type=str,
-    default='/cvgl2/u/jgwak/Datasets/scannet_ply',
-    help='Scannet sparse voxelization dataset root dir')
-
-data_arg.add_argument(
-    '--synthia_camera_path', type=str, default='/cvgl/group/Synthia/%s/CameraParams/')
-
-data_arg.add_argument('--synthia_camera_intrinsic_file', type=str, default='intrinsics.txt')
-
-data_arg.add_argument(
-    '--synthia_camera_extrinsics_file', type=str, default='Stereo_Right/Omni_F/%s.txt')
-
-# Point Cloud Dataset
-data_arg.add_argument(
     '--stanford3d_online_path',
     type=str,
-    default='/cvgl2/u/jgwak/Datasets/stanford_subsampled',
+    default='/home/chrischoy/datasets/stanford_preprocessed',
     help='Stanford precropped dataset root dir')
 
 # Training / test parameters

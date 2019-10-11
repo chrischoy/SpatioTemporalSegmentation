@@ -14,8 +14,6 @@ CLASS_LABELS = ('wall', 'floor', 'cabinet', 'bed', 'chair', 'sofa', 'table', 'do
                 'bookshelf', 'picture', 'counter', 'desk', 'curtain', 'refrigerator',
                 'shower curtain', 'toilet', 'sink', 'bathtub', 'otherfurniture')
 VALID_CLASS_IDS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 24, 28, 33, 34, 36, 39)
-TEST_FULL_PLY_PATH = 'test/%s_vh_clean_2.ply'
-FULL_EVAL_PATH = 'outputs/fulleval'
 SCANNET_COLOR_MAP = {
     0: (0., 0., 0.),
     1: (174., 199., 232.),
@@ -78,11 +76,12 @@ class ScannetVoxelizationDataset(VoxelizationDataset):
   IGNORE_LABELS = tuple(set(range(41)) - set(VALID_CLASS_IDS))
   IS_FULL_POINTCLOUD_EVAL = True
 
+  # If trainval.txt does not exist, copy train.txt and add contents from val.txt
   DATA_PATH_FILE = {
-      DatasetPhase.Train: 'scannetv2_train.txt',
-      DatasetPhase.Val: 'scannetv2_val.txt',
-      DatasetPhase.TrainVal: 'trainval_uncropped.txt',
-      DatasetPhase.Test: 'scannetv2_test.txt'
+      DatasetPhase.Train: 'train.txt',
+      DatasetPhase.Val: 'val.txt',
+      DatasetPhase.Val: 'trainval.txt',
+      DatasetPhase.Test: 'test.txt'
   }
 
   def __init__(self,

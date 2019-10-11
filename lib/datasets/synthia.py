@@ -143,7 +143,7 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
       phase = str2datasetphase_type(phase)
     if phase not in [DatasetPhase.Train, DatasetPhase.TrainVal]:
       self.CLIP_BOUND = self.TEST_CLIP_BOUND
-    data_root = config.synthia_online_path
+    data_root = config.synthia_path
     data_paths = read_txt(osp.join(data_root, self.DATA_PATH_FILE[phase]))
     data_paths = [d.split()[0] for d in data_paths]
     logging.info('Loading {}: {}'.format(self.__class__.__name__, self.DATA_PATH_FILE[phase]))
@@ -191,7 +191,7 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
       phase = str2datasetphase_type(phase)
     if phase not in [DatasetPhase.Train, DatasetPhase.TrainVal]:
       self.CLIP_BOUND = self.TEST_CLIP_BOUND
-    data_root = config.synthia_online_path
+    data_root = config.synthia_path
     data_paths = read_txt(osp.join(data_root, self.DATA_PATH_FILE[phase]))
     data_paths = sorted([d.split()[0] for d in data_paths])
     seq2files = defaultdict(list)
