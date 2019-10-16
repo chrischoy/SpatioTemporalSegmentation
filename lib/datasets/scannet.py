@@ -78,10 +78,10 @@ class ScannetVoxelizationDataset(VoxelizationDataset):
 
   # If trainval.txt does not exist, copy train.txt and add contents from val.txt
   DATA_PATH_FILE = {
-      DatasetPhase.Train: 'train.txt',
-      DatasetPhase.Val: 'val.txt',
-      DatasetPhase.Val: 'trainval.txt',
-      DatasetPhase.Test: 'test.txt'
+      DatasetPhase.Train: 'scannetv2_train.txt',
+      DatasetPhase.Val: 'scannetv2_val.txt',
+      DatasetPhase.TrainVal: 'scannetv2_trainval.txt',
+      DatasetPhase.Test: 'scannetv2_test.txt'
   }
 
   def __init__(self,
