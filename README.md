@@ -15,11 +15,33 @@ python -m lib.datasets.prepreocessing.scannet
 
 3. Create `scannetv2_trainval.txt` by concatenating `scannetv2_train.txt` and `scannetv2_val.txt`.
 
-4. Train the scannet network with
+4. Train the network with
 
 ```
-export BATCH_SIZE=N; ./scripts/train_scannet.sh 0 -default "--scannet_path /path/to/preprocessed/scannet"
+export BATCH_SIZE=N; \
+	./scripts/train_scannet.sh 0 \
+	-default \
+	"--scannet_path /path/to/preprocessed/scannet"
 ```
 
 The first argument is the GPU id and the second argument is the path postfix
 and the last argument is the miscellaneous arguments.
+
+
+## Synthia 4D Experiment
+
+1. Download the dataset from [download](http://cvgl.stanford.edu/data2/Synthia4D.tar)
+
+2. Extract
+
+```
+tar -xf Synthia4D.tar
+tar -xzf *.tar.bz2
+```
+
+
+## Model Zoo
+
+| Model         | Dataset | Voxel Size | Performance              | Link   |
+|:-------------:|:-------:|:----------:|:------------------------:|:------:|
+| Mink16UNet34C | ScanNet | 2cm        | Test set 73.6% mIoU      | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
