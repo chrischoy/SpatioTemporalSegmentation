@@ -27,6 +27,7 @@ Modify the `BATCH_SIZE` accordingly.
 The first argument is the GPU id and the second argument is the path postfix
 and the last argument is the miscellaneous arguments.
 
+The official evaluation metric for ScanNet is mIoU. OA, Overal Accuracy is not the official metric and is a lot easier and should not be used soley for any official papers without mIoU for fair comparison.
 
 ## Synthia 4D Experiment
 
