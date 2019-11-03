@@ -27,7 +27,16 @@ Modify the `BATCH_SIZE` accordingly.
 The first argument is the GPU id and the second argument is the path postfix
 and the last argument is the miscellaneous arguments.
 
-The official evaluation metric for ScanNet is mIoU. OA, Overal Accuracy is not the official metric similar to the 2D image semantic segmentation as it is a lot easier and doesn't reflect the quality of the semantic segmentation. This is due to the fact that most of the scenes consist of large structures such as walls, floors and these will dominate the statistics. Thus, overall accuracy should not be used solely to prevent reviewers from comparing the baselines fairly.
+
+### mIoU vs. Overall Accuracy
+
+The official evaluation metric for ScanNet is mIoU.
+OA, Overal Accuracy is not the official metric since it is not discriminative. This is the convention from the 2D semantic segmentation as the pixelwise overall accuracy does not capture the fidelity of the semantic segmentation.
+On 3D ScanNet semantic segmentation, OA: 89.087 -> mIOU 71.496 mAP 76.127 mAcc 79.660 on the ScanNet validation set v2.
+
+Then why is the overall accuracy least discriminative metric?  This is due to the fact that most of the scenes consist of large structures
+such as walls, floors, or background and scores on these will dominate the statistics if you use Overall Accuracy.
+
 
 ## Synthia 4D Experiment
 
