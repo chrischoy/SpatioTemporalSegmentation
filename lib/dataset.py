@@ -258,7 +258,8 @@ class VoxelizationDataset(VoxelizationDatasetBase):
       pointcloud = pointcloud[inds]
 
     # Prevoxel transformations
-    pointcloud = self.prevoxel_transform(pointcloud)
+    if self.prevoxel_transform is not None:
+      pointcloud = self.prevoxel_transform(pointcloud)
 
     coords, feats, labels = self.convert_mat2cfl(pointcloud)
     coords, feats, labels, transformation = self.voxelizer.voxelize(

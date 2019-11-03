@@ -108,9 +108,10 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
   # Voxelization arguments
   CLIP_BOUND = ((-1800, 1800), (-1800, 1800), (-1800, 1800))
   TEST_CLIP_BOUND = ((-2500, 2500), (-2500, 2500), (-2500, 2500))
-  VOXEL_SIZE = 30  # cm
+  VOXEL_SIZE = 15  # cm
+
+  PREVOXELIZE_VOXEL_SIZE = 7.5
   # Elastic distortion, (granularity, magitude) pairs
-  PREVOXELIZE_VOXEL_SIZE = 30
   ELASTIC_DISTORT_PARAMS = ((80, 300),)
 
   # Augmentation arguments
@@ -124,10 +125,9 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
 
   # Split used in the Minkowski ConvNet, CVPR'19
   DATA_PATH_FILE = {
-      DatasetPhase.Train: 'train_raw_difficult.txt',
-      DatasetPhase.Val: 'val_raw_difficult.txt',
-      DatasetPhase.TrainVal: 'trainval_raw_difficult.txt',
-      DatasetPhase.Test: 'test_raw_difficult.txt'
+      DatasetPhase.Train: 'train_cvpr19.txt',
+      DatasetPhase.Val: 'val_cvpr19.txt',
+      DatasetPhase.Test: 'test_cvpr19.txt'
   }
 
   def __init__(self,
@@ -144,7 +144,7 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
     if phase not in [DatasetPhase.Train, DatasetPhase.TrainVal]:
       self.CLIP_BOUND = self.TEST_CLIP_BOUND
     data_root = config.synthia_path
-    data_paths = read_txt(osp.join(data_root, self.DATA_PATH_FILE[phase]))
+    data_paths = read_txt(osp.join('./splits/synthia4d', self.DATA_PATH_FILE[phase]))
     data_paths = [d.split()[0] for d in data_paths]
     logging.info('Loading {}: {}'.format(self.__class__.__name__, self.DATA_PATH_FILE[phase]))
     super().__init__(
@@ -164,10 +164,11 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
   # Voxelization arguments
   CLIP_BOUND = ((-1800, 1800), (-1800, 1800), (-1800, 1800))
   TEST_CLIP_BOUND = ((-2500, 2500), (-2500, 2500), (-2500, 2500))
-  VOXEL_SIZE = 30  # cm
+  VOXEL_SIZE = 15  # cm
 
-  PREVOXELIZE_VOXEL_SIZE = 30
-  ELASTIC_DISTORT_PARAMS = ((80, 300),)
+  PREVOXELIZE_VOXEL_SIZE = 7.5
+  # For temporal sequences, the voxel locations has to be aligned exactly.
+  ELASTIC_DISTORT_PARAMS = None
 
   # Augmentation arguments
   ROTATION_AUGMENTATION_BOUND = ((0, 0), (-np.pi, np.pi), (0, 0))
@@ -248,6 +249,22 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
     center = _transform(center, intrinsic, extrinsic)[0]
 
     return ptc, center
+
+
+class SynthiaCVPR15cmVoxelizationDataset(SynthiaVoxelizationDataset):
+  pass
+
+
+class SynthiaCVPR30cmVoxelizationDataset(SynthiaVoxelizationDataset):
+  VOXEL_SIZE = 30
+
+
+class SynthiaAllSequencesVoxelizationDataset(SynthiaVoxelizationDataset):
+  DATA_PATH_FILE = {
+      DatasetPhase.Train: 'train_raw.txt',
+      DatasetPhase.Val: 'val_raw.txt',
+      DatasetPhase.Test: 'test_raw.txt'
+  }
 
 
 class TestSynthia(unittest.TestCase):
