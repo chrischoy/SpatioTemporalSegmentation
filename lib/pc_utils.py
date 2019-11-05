@@ -1,10 +1,8 @@
 import os
-import logging
 import numpy as np
 from numpy.linalg import matrix_rank, inv
 from plyfile import PlyData, PlyElement
 import pandas as pd
-from retrying import retry
 
 COLOR_MAP_RGB = (
     (241, 255, 82),
@@ -27,16 +25,6 @@ COLOR_MAP_RGB = (
 IGNORE_COLOR = (0, 0, 0)
 
 
-def retry_on_ioerror(exc):
-  logging.warning("Retrying file load")
-  return isinstance(exc, IOError)
-
-
-@retry(
-    retry_on_exception=retry_on_ioerror,
-    wait_exponential_multiplier=1000,
-    wait_exponential_max=10000,
-    stop_max_delay=30000)
 def read_plyfile(filepath):
   """Read ply file and return it as numpy array. Returns None if emtpy."""
   with open(filepath, 'rb') as f:

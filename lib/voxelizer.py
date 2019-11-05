@@ -132,6 +132,63 @@ class Voxelizer:
 
     return coords_aug, feats, labels, rigid_transformation.flatten()
 
+  def voxelize_temporal(self,
+                        coords_t,
+                        feats_t,
+                        labels_t,
+                        centers=None,
+                        return_transformation=False):
+    # Legacy code, remove
+    if centers is None:
+      centers = [None, ] * len(coords_t)
+    coords_tc, feats_tc, labels_tc, transformation_tc = [], [], [], []
+
+    # ######################### Data Augmentation #############################
+    # Get rotation and scale
+    M_v, M_r = self.get_transformation_matrix()
+    # Apply transformations
+    rigid_transformation = M_v
+    if self.use_augmentation:
+      rigid_transformation = M_r @ rigid_transformation
+    # ######################### Voxelization #############################
+    # Voxelize coords
+    for coords, feats, labels, center in zip(coords_t, feats_t, labels_t, centers):
+
+      ###################################
+      # Clip the data if bound exists
+      if self.clip_bound is not None:
+        trans_aug_ratio = np.zeros(3)
+        if self.use_augmentation and self.translation_augmentation_ratio_bound is not None:
+          for axis_ind, trans_ratio_bound in enumerate(self.translation_augmentation_ratio_bound):
+            trans_aug_ratio[axis_ind] = np.random.uniform(*trans_ratio_bound)
+
+        clip_inds = self.clip(coords, center, trans_aug_ratio)
+        coords, feats = coords[clip_inds], feats[clip_inds]
+        if labels is not None:
+          labels = labels[clip_inds]
+      ###################################
+
+      homo_coords = np.hstack((coords, np.ones((coords.shape[0], 1), dtype=coords.dtype)))
+      coords_aug = np.floor(homo_coords @ rigid_transformation.T)[:, :3]
+
+      inds = ME.utils.sparse_quantize(coords_aug, return_index=True)
+      coords_aug, feats, labels = coords_aug[inds], feats[inds], labels[inds]
+
+      # If use normal rotation
+      if feats.shape[1] > 6:
+        feats[:, 3:6] = feats[:, 3:6] @ (M_r[:3, :3].T)
+
+      coords_tc.append(coords_aug)
+      feats_tc.append(feats)
+      labels_tc.append(labels)
+      transformation_tc.append(rigid_transformation.flatten())
+
+    return_args = [coords_tc, feats_tc, labels_tc]
+    if return_transformation:
+      return_args.append(transformation_tc)
+
+    return tuple(return_args)
+
 
 def test():
   N = 16575

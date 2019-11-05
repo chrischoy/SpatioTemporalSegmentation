@@ -194,7 +194,7 @@ class VoxelizationDataset(VoxelizationDatasetBase):
   ELASTIC_DISTORT_PARAMS = None
 
   # MISC.
-  PREVOXELIZE_VOXEL_SIZE = None
+  PREVOXELIZATION_VOXEL_SIZE = None
 
   def __init__(self,
                data_paths,
@@ -252,9 +252,9 @@ class VoxelizationDataset(VoxelizationDatasetBase):
     pointcloud, center = self.load_ply(index)
 
     # Downsample the pointcloud with finer voxel size before transformation for memory and speed
-    if self.PREVOXELIZE_VOXEL_SIZE is not None:
+    if self.PREVOXELIZATION_VOXEL_SIZE is not None:
       inds = ME.utils.sparse_quantize(
-          pointcloud[:, :3] / self.PREVOXELIZE_VOXEL_SIZE, return_index=True)
+          pointcloud[:, :3] / self.PREVOXELIZATION_VOXEL_SIZE, return_index=True)
       pointcloud = pointcloud[inds]
 
     # Prevoxel transformations
@@ -296,9 +296,18 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
                augment_data=False,
                config=None,
                **kwargs):
-    VoxelizationDataset.__init__(self, data_paths, input_transform, target_transform, data_root,
-                                 ignore_label, return_transformation, augment_data, config,
-                                 **kwargs)
+    VoxelizationDataset.__init__(
+        self,
+        data_paths,
+        prevoxel_transform=prevoxel_transform,
+        input_transform=input_transform,
+        target_transform=target_transform,
+        data_root=data_root,
+        ignore_label=ignore_label,
+        return_transformation=return_transformation,
+        augment_data=augment_data,
+        config=config,
+        **kwargs)
     self.temporal_dilation = temporal_dilation
     self.temporal_numseq = temporal_numseq
     temporal_window = temporal_dilation * (temporal_numseq - 1) + 1
@@ -333,10 +342,11 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
     ptcs, centers = zip(*world_pointclouds)
 
     # Downsample pointcloud for speed and memory
-    if self.PREVOXELIZE_VOXEL_SIZE is not None:
+    if self.PREVOXELIZATION_VOXEL_SIZE is not None:
       new_ptcs = []
       for ptc in ptcs:
-        inds = ME.utils.sparse_quantize(ptc[:, :3] / self.PREVOXELIZE_VOXEL_SIZE, return_index=True)
+        inds = ME.utils.sparse_quantize(
+            ptc[:, :3] / self.PREVOXELIZATION_VOXEL_SIZE, return_index=True)
         new_ptcs.append(ptc[inds])
       ptcs = new_ptcs
 

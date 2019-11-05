@@ -1,6 +1,6 @@
 from models.resnet import ResNetBase, get_norm
 from models.modules.common import ConvType, NormType, conv, conv_tr
-from models.modules.resnet_block import BasicBlock, Bottleneck, BasicBlockSN, BottleneckSN, BasicBlockIN, BottleneckIN, BasicBlockLN
+from models.modules.resnet_block import BasicBlock, Bottleneck
 
 from MinkowskiEngine import MinkowskiReLU
 import MinkowskiEngine.MinkowskiOps as me
@@ -257,122 +257,6 @@ class ResUNet34F(ResUNet34):
   PLANES = (32, 64, 128, 256, 128, 64, 32)
 
 
-class ResUNetSN14(ResUNet14):
-  NORM_TYPE = NormType.SPARSE_SWITCH_NORM
-  BLOCK = BasicBlockSN
-
-
-class ResUNetSN18(ResUNet18):
-  NORM_TYPE = NormType.SPARSE_SWITCH_NORM
-  BLOCK = BasicBlockSN
-
-
-class ResUNetSN34(ResUNet34):
-  NORM_TYPE = NormType.SPARSE_SWITCH_NORM
-  BLOCK = BasicBlockSN
-
-
-class ResUNetSN50(ResUNet50):
-  NORM_TYPE = NormType.SPARSE_SWITCH_NORM
-  BLOCK = BottleneckSN
-
-
-class ResUNetSN101(ResUNet101):
-  NORM_TYPE = NormType.SPARSE_SWITCH_NORM
-  BLOCK = BottleneckSN
-
-
-class ResUNetIN14(ResUNet14):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetIN18(ResUNet18):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetIN34(ResUNet34):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetIN34E(ResUNet34E):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetIN50(ResUNet50):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
-class ResUNetIN101(ResUNet101):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
-# Experimentally, worse than others
-class ResUNetLN14(ResUNet14):
-  NORM_TYPE = NormType.SPARSE_LAYER_NORM
-  BLOCK = BasicBlockLN
-
-
-class ResUNetTemporalBase(ResUNetBase):
-  """
-  ResUNet that can take 4D independently. No temporal convolution.
-  """
-  CONV_TYPE = ConvType.SPATIAL_HYPERCUBE
-
-  def __init__(self, in_channels, out_channels, config, D=4, **kwargs):
-    super(ResUNetTemporalBase, self).__init__(in_channels, out_channels, config, D, **kwargs)
-
-
-class ResUNetTemporal14(ResUNet14, ResUNetTemporalBase):
-  pass
-
-
-class ResUNetTemporal18(ResUNet18, ResUNetTemporalBase):
-  pass
-
-
-class ResUNetTemporal34(ResUNet34, ResUNetTemporalBase):
-  pass
-
-
-class ResUNetTemporal50(ResUNet50, ResUNetTemporalBase):
-  pass
-
-
-class ResUNetTemporal101(ResUNet101, ResUNetTemporalBase):
-  pass
-
-
-class ResUNetTemporalIN14(ResUNetTemporal14):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetTemporalIN18(ResUNetTemporal18):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetTemporalIN34(ResUNetTemporal34):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class ResUNetTemporalIN50(ResUNetTemporal50):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
-class ResUNetTemporalIN101(ResUNetTemporal101):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
 class STResUNetBase(ResUNetBase):
 
   CONV_TYPE = ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS
@@ -399,31 +283,6 @@ class STResUNet50(STResUNetBase, ResUNet50):
 
 class STResUNet101(STResUNetBase, ResUNet101):
   pass
-
-
-class STResUNetIN14(STResUNet14):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class STResUNetIN18(STResUNet18):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class STResUNetIN34(STResUNet34):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class STResUNetIN50(STResUNet50):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
-class STResUNetIN101(STResUNet101):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
 
 
 class STResTesseractUNetBase(STResUNetBase):

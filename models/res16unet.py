@@ -1,6 +1,6 @@
 from models.resnet import ResNetBase, get_norm
 from models.modules.common import ConvType, NormType, conv, conv_tr
-from models.modules.resnet_block import BasicBlock, Bottleneck, BasicBlockIN, BottleneckIN, BasicBlockLN
+from models.modules.resnet_block import BasicBlock, Bottleneck
 
 from MinkowskiEngine import MinkowskiReLU
 import MinkowskiEngine.MinkowskiOps as me
@@ -331,67 +331,6 @@ class Res16UNet34C(Res16UNet34):
   PLANES = (32, 64, 128, 256, 256, 128, 96, 96)
 
 
-# Experimentally, worse than others
-class Res16UNetLN14(Res16UNet14):
-  NORM_TYPE = NormType.SPARSE_LAYER_NORM
-  BLOCK = BasicBlockLN
-
-
-class Res16UNetTemporalBase(Res16UNetBase):
-  """
-  Res16UNet that can take 4D independently. No temporal convolution.
-  """
-  CONV_TYPE = ConvType.SPATIAL_HYPERCUBE
-
-  def __init__(self, in_channels, out_channels, config, D=4, **kwargs):
-    super(Res16UNetTemporalBase, self).__init__(in_channels, out_channels, config, D, **kwargs)
-
-
-class Res16UNetTemporal14(Res16UNet14, Res16UNetTemporalBase):
-  pass
-
-
-class Res16UNetTemporal18(Res16UNet18, Res16UNetTemporalBase):
-  pass
-
-
-class Res16UNetTemporal34(Res16UNet34, Res16UNetTemporalBase):
-  pass
-
-
-class Res16UNetTemporal50(Res16UNet50, Res16UNetTemporalBase):
-  pass
-
-
-class Res16UNetTemporal101(Res16UNet101, Res16UNetTemporalBase):
-  pass
-
-
-class Res16UNetTemporalIN14(Res16UNetTemporal14):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class Res16UNetTemporalIN18(Res16UNetTemporal18):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class Res16UNetTemporalIN34(Res16UNetTemporal34):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BasicBlockIN
-
-
-class Res16UNetTemporalIN50(Res16UNetTemporal50):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
-class Res16UNetTemporalIN101(Res16UNetTemporal101):
-  NORM_TYPE = NormType.SPARSE_INSTANCE_NORM
-  BLOCK = BottleneckIN
-
-
 class STRes16UNetBase(Res16UNetBase):
 
   CONV_TYPE = ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS
@@ -401,6 +340,10 @@ class STRes16UNetBase(Res16UNetBase):
 
 
 class STRes16UNet14(STRes16UNetBase, Res16UNet14):
+  pass
+
+
+class STRes16UNet14A(STRes16UNetBase, Res16UNet14A):
   pass
 
 

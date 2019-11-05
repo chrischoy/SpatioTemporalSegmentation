@@ -110,7 +110,7 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
   TEST_CLIP_BOUND = ((-2500, 2500), (-2500, 2500), (-2500, 2500))
   VOXEL_SIZE = 15  # cm
 
-  PREVOXELIZE_VOXEL_SIZE = 7.5
+  PREVOXELIZATION_VOXEL_SIZE = 7.5
   # Elastic distortion, (granularity, magitude) pairs
   ELASTIC_DISTORT_PARAMS = ((80, 300),)
 
@@ -166,7 +166,7 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
   TEST_CLIP_BOUND = ((-2500, 2500), (-2500, 2500), (-2500, 2500))
   VOXEL_SIZE = 15  # cm
 
-  PREVOXELIZE_VOXEL_SIZE = 7.5
+  PREVOXELIZATION_VOXEL_SIZE = 7.5
   # For temporal sequences, the voxel locations has to be aligned exactly.
   ELASTIC_DISTORT_PARAMS = None
 
@@ -179,13 +179,19 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
   NUM_LABELS = 16  # Automatically subtract ignore labels after processed
   IGNORE_LABELS = (0, 1, 13, 14)  # void, sky, reserved, reserved
 
+  # Split used in the Minkowski ConvNet, CVPR'19
+  DATA_PATH_FILE = {
+      DatasetPhase.Train: 'train_cvpr19.txt',
+      DatasetPhase.Val: 'val_cvpr19.txt',
+      DatasetPhase.Test: 'test_cvpr19.txt'
+  }
+
   def __init__(self,
                config,
                prevoxel_transform=None,
                input_transform=None,
                target_transform=None,
                augment_data=True,
-               elastic_distortion=False,
                cache=False,
                phase=DatasetPhase.Train):
     if isinstance(phase, str):
@@ -193,7 +199,7 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
     if phase not in [DatasetPhase.Train, DatasetPhase.TrainVal]:
       self.CLIP_BOUND = self.TEST_CLIP_BOUND
     data_root = config.synthia_path
-    data_paths = read_txt(osp.join(data_root, self.DATA_PATH_FILE[phase]))
+    data_paths = read_txt(osp.join('./splits/synthia4d', self.DATA_PATH_FILE[phase]))
     data_paths = sorted([d.split()[0] for d in data_paths])
     seq2files = defaultdict(list)
     for f in data_paths:
@@ -211,15 +217,15 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
     TemporalVoxelizationDataset.__init__(
         self,
         file_seq_list,
-        data_root=data_root,
+        prevoxel_transform=prevoxel_transform,
         input_transform=input_transform,
         target_transform=target_transform,
+        data_root=data_root,
         ignore_label=config.ignore_label,
         temporal_dilation=config.temporal_dilation,
         temporal_numseq=config.temporal_numseq,
         return_transformation=config.return_transformation,
         augment_data=augment_data,
-        elastic_distortion=elastic_distortion,
         config=config)
 
   def load_world_pointcloud(self, filename):

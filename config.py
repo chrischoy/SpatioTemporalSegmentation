@@ -30,8 +30,7 @@ parser = argparse.ArgumentParser()
 
 # Network
 net_arg = add_argument_group('Network')
-net_arg.add_argument(
-    '--model', type=str, default='ResUNet14', help='Model name')
+net_arg.add_argument('--model', type=str, default='ResUNet14', help='Model name')
 net_arg.add_argument(
     '--conv1_kernel_size', type=int, default=3, help='First layer conv kernel size')
 net_arg.add_argument('--weights', type=str, default='None', help='Saved weights to load')
@@ -117,8 +116,16 @@ data_arg.add_argument('--train_limit_numpoints', type=int, default=0)
 data_arg.add_argument(
     '--synthia_path',
     type=str,
-    default='/home/chrischoy/datasets/synthia_preprocessed',
+    default='/home/chrischoy/datasets/Synthia/Synthia4D',
     help='Point Cloud dataset root dir')
+# For temporal sequences
+data_arg.add_argument(
+    '--synthia_camera_path', type=str, default='/home/chrischoy/datasets/Synthia/%s/CameraParams/')
+data_arg.add_argument('--synthia_camera_intrinsic_file', type=str, default='intrinsics.txt')
+data_arg.add_argument(
+    '--synthia_camera_extrinsics_file', type=str, default='Stereo_Right/Omni_F/%s.txt')
+data_arg.add_argument('--temporal_rand_dilation', type=str2bool, default=False)
+data_arg.add_argument('--temporal_rand_numseq', type=str2bool, default=False)
 
 data_arg.add_argument(
     '--scannet_path',
@@ -179,7 +186,10 @@ data_aug_arg.add_argument('--data_aug_scale_max', type=float, default=1.1)
 data_aug_arg.add_argument(
     '--data_aug_hue_max', type=float, default=0.5, help='Hue translation range. [0, 1]')
 data_aug_arg.add_argument(
-    '--data_aug_saturation_max', type=float, default=0.20, help='Saturation translation range, [0, 1]')
+    '--data_aug_saturation_max',
+    type=float,
+    default=0.20,
+    help='Saturation translation range, [0, 1]')
 
 # Test
 test_arg = add_argument_group('Test')
