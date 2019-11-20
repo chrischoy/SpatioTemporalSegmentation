@@ -99,7 +99,7 @@ class ScannetVoxelizationDataset(VoxelizationDataset):
     data_root = config.scannet_path
     if phase not in [DatasetPhase.Train, DatasetPhase.TrainVal]:
       self.CLIP_BOUND = self.TEST_CLIP_BOUND
-    data_paths = read_txt(os.path.join('./splits/scannt', self.DATA_PATH_FILE[phase]))
+    data_paths = read_txt(os.path.join('./splits/scannet', self.DATA_PATH_FILE[phase]))
     logging.info('Loading {}: {}'.format(self.__class__.__name__, self.DATA_PATH_FILE[phase]))
     super().__init__(
         data_paths,
