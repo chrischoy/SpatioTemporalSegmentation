@@ -10,7 +10,7 @@ This repository contains the accompanying code for [4D-SpatioTemporal ConvNets: 
 2. Next, preprocess all scannet raw point cloud with the following command after you set the path correctly.
 
 ```
-python -m lib.datasets.prepreocessing.scannet
+python -m lib.datasets.preprocessing.scannet
 ```
 
 3. Train the network with
@@ -65,6 +65,7 @@ The above script trains a network. You have to change the arguments accordingly.
 
 ## Model Zoo
 
-| Model         | Dataset | Voxel Size | Performance              | Link   |
-|:-------------:|:-------:|:----------:|:------------------------:|:------:|
-| Mink16UNet34C | ScanNet | 2cm        | Test set 73.6% mIoU      | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
+| Model         | Dataset             | Voxel Size | Conv1 Kernel Size | Performance              | Link   |
+|:-------------:|:-------------------:|:----------:|:-----------------:|:------------------------:|:------:|
+| Mink16UNet34C | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU      | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
+| Mink16UNet34C | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU without rotation average [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |

@@ -434,7 +434,7 @@ def initialize_data_loader(DatasetClass,
         t.ChromaticAutoContrast(),
         t.ChromaticTranslation(config.data_aug_color_trans_ratio),
         t.ChromaticJitter(config.data_aug_color_jitter_std),
-        t.HueSaturationTranslation(config.data_aug_hue_max, config.data_aug_saturation_max),
+        # t.HueSaturationTranslation(config.data_aug_hue_max, config.data_aug_saturation_max),
     ]
 
   if len(input_transforms) > 0:
