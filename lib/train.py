@@ -69,42 +69,38 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
       data_time, batch_loss = 0, 0
       iter_timer.tic()
 
-      try: # torch issue #16998
-        for sub_iter in range(config.iter_size):
-          # Get training data
-          data_timer.tic()
-          if config.return_transformation:
-            coords, input, target, pointcloud, transformation = data_iter.next()
-          else:
-            coords, input, target = data_iter.next()
+      for sub_iter in range(config.iter_size):
+        # Get training data
+        data_timer.tic()
+        if config.return_transformation:
+          coords, input, target, pointcloud, transformation = data_iter.next()
+        else:
+          coords, input, target = data_iter.next()
 
-          # For some networks, making the network invariant to even, odd coords is important
-          coords[:, :3] += (torch.rand(3) * 100).type_as(coords)
+        # For some networks, making the network invariant to even, odd coords is important
+        coords[:, :3] += (torch.rand(3) * 100).type_as(coords)
 
-          # Preprocess input
-          color = input[:, :3].int()
-          if config.normalize_color:
-            input[:, :3] = input[:, :3] / 255. - 0.5
-          sinput = SparseTensor(input, coords).to(device)
+        # Preprocess input
+        color = input[:, :3].int()
+        if config.normalize_color:
+          input[:, :3] = input[:, :3] / 255. - 0.5
+        sinput = SparseTensor(input, coords).to(device)
 
-          data_time += data_timer.toc(False)
+        data_time += data_timer.toc(False)
 
-          # Feed forward
-          inputs = (sinput,) if config.wrapper_type == 'None' else (sinput, coords, color)
-          # model.initialize_coords(*init_args)
-          soutput = model(*inputs)
-          # The output of the network is not sorted
-          target = target.long().to(device)
+        # Feed forward
+        inputs = (sinput,) if config.wrapper_type == 'None' else (sinput, coords, color)
+        # model.initialize_coords(*init_args)
+        soutput = model(*inputs)
+        # The output of the network is not sorted
+        target = target.long().to(device)
 
-          loss = criterion(soutput.F, target.long())
+        loss = criterion(soutput.F, target.long())
 
-          # Compute and accumulate gradient
-          loss /= config.iter_size
-          batch_loss += loss.item()
-          loss.backward()
-      except Exception as e:
-        logging.error(e)
-        continue
+        # Compute and accumulate gradient
+        loss /= config.iter_size
+        batch_loss += loss.item()
+        loss.backward()
 
       # Update number of steps
       optimizer.step()

@@ -430,6 +430,7 @@ def initialize_data_loader(DatasetClass,
 
   if augment_data:
     input_transforms += [
+        t.RandomDropout(0.2),
         t.RandomHorizontalFlip(DatasetClass.ROTATION_AXIS, DatasetClass.IS_TEMPORAL),
         t.ChromaticAutoContrast(),
         t.ChromaticTranslation(config.data_aug_color_trans_ratio),

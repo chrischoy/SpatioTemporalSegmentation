@@ -84,12 +84,14 @@ class Voxelizer:
       trans = np.multiply(trans_aug_ratio, bound_size)
       center += trans
     # Clip points outside the limit
-    clip_inds = ((coords[:, 0] >= (lim[0][0] + center[0])) &
-                 (coords[:, 0] < (lim[0][1] + center[0])) &
-                 (coords[:, 1] >= (lim[1][0] + center[1])) &
-                 (coords[:, 1] < (lim[1][1] + center[1])) &
-                 (coords[:, 2] >= (lim[2][0] + center[2])) &
-                 (coords[:, 2] < (lim[2][1] + center[2])))
+    clip_inds = ((coords[:, 0] >=
+                  (lim[0][0] + center[0])) & (coords[:, 0] <
+                                              (lim[0][1] + center[0])) & (coords[:, 1] >=
+                                                                          (lim[1][0] + center[1])) &
+                 (coords[:, 1] <
+                  (lim[1][1] + center[1])) & (coords[:, 2] >=
+                                              (lim[2][0] + center[2])) & (coords[:, 2] <
+                                                                          (lim[2][1] + center[2])))
     return clip_inds
 
   def voxelize(self, coords, feats, labels, center=None):
@@ -123,12 +125,9 @@ class Voxelizer:
     rigid_transformation = M_t @ rigid_transformation
     coords_aug = np.floor(coords_aug - min_coords)
 
-    inds = ME.utils.sparse_quantize(coords_aug, return_index=True)
-    coords_aug, feats, labels = coords_aug[inds], feats[inds], labels[inds]
-
-    # Normal rotation
-    if feats.shape[1] > 6:
-      feats[:, 3:6] = feats[:, 3:6] @ (M_r[:3, :3].T)
+    # key = self.hash(coords_aug)  # floor happens by astype(np.uint64)
+    coords_aug, feats, labels = ME.utils.sparse_quantize(
+        coords_aug, feats, labels=labels, ignore_label=self.ignore_label)
 
     return coords_aug, feats, labels, rigid_transformation.flatten()
 
@@ -140,7 +139,9 @@ class Voxelizer:
                         return_transformation=False):
     # Legacy code, remove
     if centers is None:
-      centers = [None, ] * len(coords_t)
+      centers = [
+          None,
+      ] * len(coords_t)
     coords_tc, feats_tc, labels_tc, transformation_tc = [], [], [], []
 
     # ######################### Data Augmentation #############################
@@ -171,12 +172,8 @@ class Voxelizer:
       homo_coords = np.hstack((coords, np.ones((coords.shape[0], 1), dtype=coords.dtype)))
       coords_aug = np.floor(homo_coords @ rigid_transformation.T)[:, :3]
 
-      inds = ME.utils.sparse_quantize(coords_aug, return_index=True)
-      coords_aug, feats, labels = coords_aug[inds], feats[inds], labels[inds]
-
-      # If use normal rotation
-      if feats.shape[1] > 6:
-        feats[:, 3:6] = feats[:, 3:6] @ (M_r[:3, :3].T)
+      coords_aug, feats, labels = ME.utils.sparse_quantize(
+          coords_aug, feats, labels=labels, ignore_label=self.ignore_label)
 
       coords_tc.append(coords_aug)
       feats_tc.append(feats)
