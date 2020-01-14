@@ -92,9 +92,9 @@ Modify the stanford 3d path in the script and run
 ## Model Zoo
 
 | Model         | Dataset             | Voxel Size | Conv1 Kernel Size | Performance              | Link   |
-|:-------------:|:-------------------:|:----------:|:-----------------:|:------------------------:|:------:|
-| Mink16UNet34C | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU      | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
-| Mink16UNet34C | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU without rotation average [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
-| Mink16UNet18  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.483% mIoU w/o rotation average, no sliding window | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18_stanford-conv1-5.pth) |
+|:-------------:|:-------------------:|:----------:|:-----------------:|:-------------------------------------------------------------------------------:|:------:|
+| Mink16UNet34C | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU, no sliding window                                          | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
+| Mink16UNet34C | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU, no rotation average, no sliding window [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
+| Mink16UNet18  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.828% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/Gj3PrPFr) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18_stanford-conv1-5.pth) |
 
 Note that sliding window style evaluation (cropping and stitching results) used in many related works effectively works as an ensemble (rotation averaging) which boosts the performance.
