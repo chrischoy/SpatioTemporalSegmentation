@@ -224,7 +224,7 @@ class Res16UNetBase(ResNetBase):
     out = self.bntr4(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b3p8))
+    out = me.cat(out, out_b3p8)
     out = self.block5(out)
 
     # pixel_dist=4
@@ -232,7 +232,7 @@ class Res16UNetBase(ResNetBase):
     out = self.bntr5(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b2p4))
+    out = me.cat(out, out_b2p4)
     out = self.block6(out)
 
     # pixel_dist=2
@@ -240,7 +240,7 @@ class Res16UNetBase(ResNetBase):
     out = self.bntr6(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b1p2))
+    out = me.cat(out, out_b1p2)
     out = self.block7(out)
 
     # pixel_dist=1
@@ -248,7 +248,7 @@ class Res16UNetBase(ResNetBase):
     out = self.bntr7(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_p1))
+    out = me.cat(out, out_p1)
     out = self.block8(out)
 
     return self.final(out)

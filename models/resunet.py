@@ -197,21 +197,21 @@ class MinkUNetBase(ResNetBase):
     out = self.bntr4(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b3p4))
+    out = me.cat(out, out_b3p4)
     out = self.block5(out)
 
     out = self.convtr5p4s2(out)
     out = self.bntr5(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b2p2))
+    out = me.cat(out, out_b2p2)
     out = self.block6(out)
 
     out = self.convtr6p2s2(out)
     out = self.bntr6(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b1p1))
+    out = me.cat(out, out_b1p1)
     return self.final(out)
 
 
@@ -460,7 +460,7 @@ class MinkUNetHyper(MinkUNetBase):
     out = self.bntr4(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b3p4))
+    out = me.cat(out, out_b3p4)
     out = self.block5(out)
     out_5 = self.pool_tr5(out)
 
@@ -468,7 +468,7 @@ class MinkUNetHyper(MinkUNetBase):
     out = self.bntr5(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b2p2))
+    out = me.cat(out, out_b2p2)
     out = self.block6(out)
     out_6 = self.pool_tr6(out)
 
@@ -476,7 +476,7 @@ class MinkUNetHyper(MinkUNetBase):
     out = self.bntr6(out)
     out = self.relu(out)
 
-    out = me.cat((out, out_b1p1, out_6, out_5))
+    out = me.cat(out, out_b1p1, out_6, out_5)
     return self.final(out)
 
 
