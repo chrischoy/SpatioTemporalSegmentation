@@ -91,7 +91,7 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
     for iteration in range(max_iter):
       data_timer.tic()
       if config.return_transformation:
-        coords, input, target, pointcloud, transformation = data_iter.next()
+        coords, input, target, transformation = data_iter.next()
       else:
         coords, input, target = data_iter.next()
         transformation = None
@@ -119,6 +119,7 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
 
       if has_gt:
         if config.evaluate_original_pointcloud:
+          raise NotImplementedError('pointcloud')
           output, pred, target = permute_pointcloud(coords, pointcloud, transformation,
                                                     dataset.label_map, output, pred)
 

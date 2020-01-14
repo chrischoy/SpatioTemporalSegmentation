@@ -6,6 +6,7 @@ import random
 import numpy as np
 from enum import Enum
 
+import torch
 from torch.utils.data import Dataset, DataLoader
 
 import MinkowskiEngine as ME
@@ -196,6 +197,9 @@ class VoxelizationDataset(VoxelizationDatasetBase):
   # MISC.
   PREVOXELIZATION_VOXEL_SIZE = None
 
+  # Augment coords to feats
+  AUGMENT_COORDS_TO_FEATS = False
+
   def __init__(self,
                data_paths,
                prevoxel_transform=None,
@@ -244,24 +248,33 @@ class VoxelizationDataset(VoxelizationDatasetBase):
     self.label_map = label_map
     self.NUM_LABELS -= len(self.IGNORE_LABELS)
 
+  def _augment_coords_to_feats(self, coords, feats, labels=None):
+    norm_coords = coords - coords.mean(0)
+    # color must come first.
+    if isinstance(coords, np.ndarray):
+      feats = np.concatenate((feats, norm_coords), 1)
+    else:
+      feats = torch.cat((feats, norm_coords), 1)
+    return coords, feats, labels
+
   def convert_mat2cfl(self, mat):
     # Generally, xyz,rgb,label
     return mat[:, :3], mat[:, 3:-1], mat[:, -1]
 
   def __getitem__(self, index):
-    pointcloud, center = self.load_ply(index)
-
+    coords, feats, labels, center = self.load_ply(index)
     # Downsample the pointcloud with finer voxel size before transformation for memory and speed
     if self.PREVOXELIZATION_VOXEL_SIZE is not None:
       inds = ME.utils.sparse_quantize(
-          pointcloud[:, :3] / self.PREVOXELIZATION_VOXEL_SIZE, return_index=True)
-      pointcloud = pointcloud[inds]
+          coords / self.PREVOXELIZATION_VOXEL_SIZE, return_index=True)
+      coords = coords[inds]
+      feats = feats[inds]
+      labels = labels[inds]
 
     # Prevoxel transformations
     if self.prevoxel_transform is not None:
-      pointcloud = self.prevoxel_transform(pointcloud)
+      coords, feats, labels = self.prevoxel_transform(coords, feats, labels)
 
-    coords, feats, labels = self.convert_mat2cfl(pointcloud)
     coords, feats, labels, transformation = self.voxelizer.voxelize(
         coords, feats, labels, center=center)
 
@@ -273,9 +286,14 @@ class VoxelizationDataset(VoxelizationDatasetBase):
     if self.IGNORE_LABELS is not None:
       labels = np.array([self.label_map[x] for x in labels], dtype=np.int)
 
+    # Use coordinate features if config is set
+    if self.AUGMENT_COORDS_TO_FEATS:
+      coords, feats, labels = self._augment_coords_to_feats(coords, feats, labels)
+
     return_args = [coords, feats, labels]
     if self.return_transformation:
-      return_args.extend([pointcloud.astype(np.float32), transformation.astype(np.float32)])
+      return_args.append(transformation.astype(np.float32))
+
     return tuple(return_args)
 
 
@@ -319,10 +337,6 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
   def load_world_pointcloud(self, filename):
     raise NotImplementedError
 
-  def convert_mat2cfl(self, mat):
-    # Generally, xyz,rgb,label
-    return mat[:, :3], mat[:, 3:-1], mat[:, -1]
-
   def __getitem__(self, index):
     for seq_idx, numel in enumerate(self.numels):
       if index >= numel:
@@ -353,7 +367,6 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
     # Apply prevoxel transformations
     ptcs = [self.prevoxel_transform(ptc) for ptc in ptcs]
 
-    ptcs = [self.convert_mat2cfl(ptc) for ptc in ptcs]
     coords, feats, labels = zip(*ptcs)
     outs = self.voxelizer.voxelize_temporal(
         coords, feats, labels, centers=centers, return_transformation=self.return_transformation)

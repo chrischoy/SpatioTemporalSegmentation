@@ -1,4 +1,6 @@
 # Change dataloader multiprocess start method to anything not fork
+import open3d as o3d
+
 import torch.multiprocessing as mp
 try:
   mp.set_start_method('forkserver')  # Reuse process created

@@ -79,19 +79,30 @@ class Voxelizer:
     bound_size = bound_max - bound_min
     if center is None:
       center = bound_min + bound_size * 0.5
-    lim = self.clip_bound
     if trans_aug_ratio is not None:
       trans = np.multiply(trans_aug_ratio, bound_size)
       center += trans
+    lim = self.clip_bound
+
+    if isinstance(self.clip_bound, (int, float)):
+      if bound_size.max() < self.clip_bound:
+        return None
+      else:
+        clip_inds = ((coords[:, 0] >= (-lim + center[0])) & \
+            (coords[:, 0] < (lim + center[0])) & \
+            (coords[:, 1] >= (-lim + center[1])) & \
+            (coords[:, 1] < (lim + center[1])) & \
+            (coords[:, 2] >= (-lim + center[2])) & \
+            (coords[:, 2] < (lim + center[2])))
+        return clip_inds
+
     # Clip points outside the limit
-    clip_inds = ((coords[:, 0] >=
-                  (lim[0][0] + center[0])) & (coords[:, 0] <
-                                              (lim[0][1] + center[0])) & (coords[:, 1] >=
-                                                                          (lim[1][0] + center[1])) &
-                 (coords[:, 1] <
-                  (lim[1][1] + center[1])) & (coords[:, 2] >=
-                                              (lim[2][0] + center[2])) & (coords[:, 2] <
-                                                                          (lim[2][1] + center[2])))
+    clip_inds = ((coords[:, 0] >= (lim[0][0] + center[0])) & \
+        (coords[:, 0] < (lim[0][1] + center[0])) & \
+        (coords[:, 1] >= (lim[1][0] + center[1])) & \
+        (coords[:, 1] < (lim[1][1] + center[1])) & \
+        (coords[:, 2] >= (lim[2][0] + center[2])) & \
+        (coords[:, 2] < (lim[2][1] + center[2])))
     return clip_inds
 
   def voxelize(self, coords, feats, labels, center=None):
@@ -103,7 +114,7 @@ class Voxelizer:
           trans_aug_ratio[axis_ind] = np.random.uniform(*trans_ratio_bound)
 
       clip_inds = self.clip(coords, center, trans_aug_ratio)
-      if clip_inds.sum():
+      if clip_inds is not None:
         coords, feats = coords[clip_inds], feats[clip_inds]
         if labels is not None:
           labels = labels[clip_inds]
@@ -164,9 +175,10 @@ class Voxelizer:
             trans_aug_ratio[axis_ind] = np.random.uniform(*trans_ratio_bound)
 
         clip_inds = self.clip(coords, center, trans_aug_ratio)
-        coords, feats = coords[clip_inds], feats[clip_inds]
-        if labels is not None:
-          labels = labels[clip_inds]
+        if clip_inds is not None:
+          coords, feats = coords[clip_inds], feats[clip_inds]
+          if labels is not None:
+            labels = labels[clip_inds]
       ###################################
 
       homo_coords = np.hstack((coords, np.ones((coords.shape[0], 1), dtype=coords.dtype)))

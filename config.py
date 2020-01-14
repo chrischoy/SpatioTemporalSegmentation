@@ -93,7 +93,7 @@ dir_arg.add_argument('--data_dir', type=str, default='data')
 
 # Data
 data_arg = add_argument_group('Data')
-data_arg.add_argument('--dataset', type=str, default='ScannetSparseVoxelization2cmDataset')
+data_arg.add_argument('--dataset', type=str, default='ScannetVoxelization2cmDataset')
 data_arg.add_argument('--temporal_dilation', type=int, default=30)
 data_arg.add_argument('--temporal_numseq', type=int, default=3)
 data_arg.add_argument('--point_lim', type=int, default=-1)
@@ -134,15 +134,15 @@ data_arg.add_argument(
     help='Scannet online voxelization dataset root dir')
 
 data_arg.add_argument(
-    '--stanford3d_online_path',
+    '--stanford3d_path',
     type=str,
-    default='/home/chrischoy/datasets/stanford_preprocessed',
+    default='/home/chrischoy/datasets/Stanford3D',
     help='Stanford precropped dataset root dir')
 
 # Training / test parameters
 train_arg = add_argument_group('Training')
 train_arg.add_argument('--is_train', type=str2bool, default=True)
-train_arg.add_argument('--stat_freq', type=int, default=10, help='print frequency')
+train_arg.add_argument('--stat_freq', type=int, default=40, help='print frequency')
 train_arg.add_argument('--test_stat_freq', type=int, default=100, help='print frequency')
 train_arg.add_argument('--save_freq', type=int, default=1000, help='save frequency')
 train_arg.add_argument('--val_freq', type=int, default=1000, help='validation frequency')
@@ -174,12 +174,6 @@ data_aug_arg.add_argument(
     '--data_aug_color_trans_ratio', type=float, default=0.10, help='Color translation range')
 data_aug_arg.add_argument(
     '--data_aug_color_jitter_std', type=float, default=0.05, help='STD of color jitter')
-data_aug_arg.add_argument(
-    '--data_aug_height_trans_std', type=float, default=1, help='STD of height translation')
-data_aug_arg.add_argument(
-    '--data_aug_height_jitter_std', type=float, default=0.1, help='STD of height jitter')
-data_aug_arg.add_argument(
-    '--data_aug_normal_jitter_std', type=float, default=0.01, help='STD of normal jitter')
 data_aug_arg.add_argument('--normalize_color', type=str2bool, default=True)
 data_aug_arg.add_argument('--data_aug_scale_min', type=float, default=0.9)
 data_aug_arg.add_argument('--data_aug_scale_max', type=float, default=1.1)

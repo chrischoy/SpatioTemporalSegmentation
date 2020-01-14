@@ -43,15 +43,16 @@ class ChromaticAutoContrast(object):
       # std = np.std(feats, 0, keepdims=True)
       # lo = mean - std
       # hi = mean + std
-      lo = np.min(feats, 0, keepdims=True)
-      hi = np.max(feats, 0, keepdims=True)
+      lo = feats[:, :3].min(0, keepdims=True)
+      hi = feats[:, :3].max(0, keepdims=True)
+      assert hi.max() > 1, f"invalid color value. Color is supposed to be [0-255]"
 
       scale = 255 / (hi - lo)
 
-      contrast_feats = (feats - lo) * scale
+      contrast_feats = (feats[:, :3] - lo) * scale
 
       blend_factor = random.random() if self.randomize_blend_factor else self.blend_factor
-      feats = (1 - blend_factor) * feats + blend_factor * contrast_feats
+      feats[:, :3] = (1 - blend_factor) * feats + blend_factor * contrast_feats
     return coords, feats, labels
 
 
@@ -178,7 +179,7 @@ class ElasticDistortion:
   def __init__(self, distortion_params):
     self.distortion_params = distortion_params
 
-  def elastic_distortion(self, pointcloud, granularity, magnitude):
+  def elastic_distortion(self, coords, feats, labels, granularity, magnitude):
     """Apply elastic distortion on sparse coordinate space.
 
       pointcloud: numpy array of (number of points, at least 3 spatial dims)
@@ -188,7 +189,6 @@ class ElasticDistortion:
     blurx = np.ones((3, 1, 1, 1)).astype('float32') / 3
     blury = np.ones((1, 3, 1, 1)).astype('float32') / 3
     blurz = np.ones((1, 1, 3, 1)).astype('float32') / 3
-    coords = pointcloud[:, :3]
     coords_min = coords.min(0)
 
     # Create Gaussian noise tensor of the size given by granularity.
@@ -204,19 +204,20 @@ class ElasticDistortion:
     # Trilinear interpolate noise filters for each spatial dimensions.
     ax = [
         np.linspace(d_min, d_max, d)
-        for d_min, d_max, d in zip(coords_min - granularity, coords_min +
-                                   granularity * (noise_dim - 2), noise_dim)
+        for d_min, d_max, d in zip(coords_min - granularity, coords_min + granularity *
+                                   (noise_dim - 2), noise_dim)
     ]
     interp = scipy.interpolate.RegularGridInterpolator(ax, noise, bounds_error=0, fill_value=0)
-    pointcloud[:, :3] = coords + interp(coords) * magnitude
-    return pointcloud
+    coords += interp(coords) * magnitude
+    return coords, feats, labels
 
-  def __call__(self, pointcloud):
+  def __call__(self, coords, feats, labels):
     if self.distortion_params is not None:
       if random.random() < 0.95:
         for granularity, magnitude in self.distortion_params:
-          pointcloud = self.elastic_distortion(pointcloud, granularity, magnitude)
-    return pointcloud
+          coords, feats, labels = self.elastic_distortion(coords, feats, labels, granularity,
+                                                          magnitude)
+    return coords, feats, labels
 
 
 class Compose(object):
@@ -260,8 +261,8 @@ class cfl_collate_fn_factory:
         )
         break
       coords_batch.append(
-          torch.cat((torch.from_numpy(coords[batch_id]).int(),
-                     torch.ones(num_points, 1).int() * batch_id), 1))
+          torch.cat((torch.from_numpy(
+              coords[batch_id]).int(), torch.ones(num_points, 1).int() * batch_id), 1))
       feats_batch.append(torch.from_numpy(feats[batch_id]))
       labels_batch.append(torch.from_numpy(labels[batch_id]).int())
 

@@ -1,14 +1,17 @@
-from .synthia import SynthiaCVPR15cmVoxelizationDataset, SynthiaCVPR30cmVoxelizationDataset, \
-    SynthiaAllSequencesVoxelizationDataset, SynthiaTemporalVoxelizationDataset
-from .stanford import StanfordVoxelizationDataset, StanfordVoxelization2cmDataset
-from .scannet import ScannetVoxelizationDataset, ScannetVoxelization2cmDataset
+import lib.datasets.synthia as synthia
+import lib.datasets.stanford as stanford
+import lib.datasets.scannet as scannet
 
-DATASETS = [
-    StanfordVoxelizationDataset, StanfordVoxelization2cmDataset, ScannetVoxelizationDataset,
-    ScannetVoxelization2cmDataset, SynthiaCVPR15cmVoxelizationDataset,
-    SynthiaCVPR30cmVoxelizationDataset, SynthiaTemporalVoxelizationDataset,
-    SynthiaAllSequencesVoxelizationDataset
-]
+DATASETS = []
+
+
+def add_datasets(module):
+  DATASETS.extend([getattr(module, a) for a in dir(module) if 'Dataset' in a])
+
+
+add_datasets(stanford)
+add_datasets(synthia)
+add_datasets(scannet)
 
 
 def load_dataset(name):

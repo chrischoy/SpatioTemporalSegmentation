@@ -123,7 +123,7 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
         debug_str = "===> Epoch[{}]({}/{}): Loss {:.4f}\tLR: {}\t".format(
             epoch, curr_iter,
             len(data_loader) // config.iter_size, losses.avg, lrs)
-        debug_str += "Score {:.3f}\tData time: {:.4f}, Iter time: {:.4f}".format(
+        debug_str += "Score {:.3f}\tData time: {:.4f}, Total iter time: {:.4f}".format(
             scores.avg, data_time_avg.avg, iter_time_avg.avg)
         logging.info(debug_str)
         # Reset timers

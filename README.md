@@ -63,9 +63,38 @@ export BATCH_SIZE=N; \
 The above script trains a network. You have to change the arguments accordingly. The first argument to the script is the GPU id. Second argument is the log directory postfix; change to mark your experimental setup. The final argument is a series of the miscellaneous aruments. You have to specify the synthia directory here. Also, you have to wrap all arguments with " ".
 
 
+## Stanford 3D Dataset
+
+1. Download the stanford 3d dataset from [the website](http://buildingparser.stanford.edu/dataset.html)
+
+2. Preprocess
+
+Modify the input and output directory accordingly in
+
+`lib/datasets/preprocessing/stanford.py`
+
+And run
+
+```
+python -m lib.datasets.preprocessing.stanford
+```
+
+3. Train
+
+Modify the stanford 3d path in the script and run
+
+```
+./scripts/train_stanford.sh 0 \
+	"-default" \
+	""
+```
+
 ## Model Zoo
 
 | Model         | Dataset             | Voxel Size | Conv1 Kernel Size | Performance              | Link   |
 |:-------------:|:-------------------:|:----------:|:-----------------:|:------------------------:|:------:|
 | Mink16UNet34C | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU      | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
 | Mink16UNet34C | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU without rotation average [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
+| Mink16UNet18  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.483% mIoU w/o rotation average, no sliding window | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18_stanford-conv1-5.pth) |
+
+Note that sliding window style evaluation (cropping and stitching results) used in many related works effectively works as an ensemble (rotation averaging) which boosts the performance.
