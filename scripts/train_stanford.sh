@@ -21,12 +21,11 @@ mkdir -p $LOG_DIR
 LOG="$LOG_DIR/$TIME.txt"
 
 python main.py \
-    --stanford3d_path ~/datasets/Stanford3D/ \
     --dataset StanfordArea5Dataset \
     --batch_size $BATCH_SIZE \
     --scheduler PolyLR \
     --model Res16UNet18 \
-    --conv1_kernel_size 5
+    --conv1_kernel_size 5 \
     --log_dir $LOG_DIR \
     --lr 1e-1 \
     --max_iter 60000 \

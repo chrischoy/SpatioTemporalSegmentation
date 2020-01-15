@@ -81,12 +81,10 @@ python -m lib.datasets.preprocessing.stanford
 
 3. Train
 
-Modify the stanford 3d path in the script and run
-
 ```
 ./scripts/train_stanford.sh 0 \
 	"-default" \
-	""
+	"--stanford3d_path /PATH/TO/PREPROCESSED/STANFORD"
 ```
 
 ## Model Zoo
