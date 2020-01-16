@@ -116,3 +116,20 @@ python -m demo.stanford
 ```
 
 ![](imgs/stanford.png)
+
+
+## Citing this work
+
+If you use the Minkowski Engine, please cite:
+
+- [4D Spatio-Temporal ConvNets: Minkowski Convolutional Neural Networks, CVPR'19](https://arxiv.org/abs/1904.08755), [[pdf]](https://arxiv.org/pdf/1904.08755.pdf)
+
+```
+@inproceedings{choy20194d,
+  title={4D Spatio-Temporal ConvNets: Minkowski Convolutional Neural Networks},
+  author={Choy, Christopher and Gwak, JunYoung and Savarese, Silvio},
+  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  pages={3075--3084},
+  year={2019}
+}
+```
