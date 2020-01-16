@@ -20,7 +20,7 @@ mkdir -p $LOG_DIR
 
 LOG="$LOG_DIR/$TIME.txt"
 
-python main.py \
+python -m main \
     --log_dir $LOG_DIR \
     --dataset ScannetVoxelization2cmDataset \
     --model Res16UNet34C \
@@ -35,7 +35,7 @@ python main.py \
 export TIME=$(date +"%Y-%m-%d_%H-%M-%S")
 LOG="$LOG_DIR/$TIME.txt"
 
-python main.py \
+python -m main \
     --log_dir $LOG_DIR \
     --dataset ScannetVoxelization2cmDataset \
     --model Res16UNet34C \

@@ -22,7 +22,7 @@ mkdir -p $LOG_DIR
 
 LOG="$LOG_DIR/$TIME.txt"
 
-python main.py \
+python -m main \
     --log_dir $LOG_DIR \
     --dataset $DATASET \
     --model $MODEL \

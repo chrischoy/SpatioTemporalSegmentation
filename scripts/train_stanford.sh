@@ -20,7 +20,7 @@ mkdir -p $LOG_DIR
 
 LOG="$LOG_DIR/$TIME.txt"
 
-python main.py \
+python -m main \
     --dataset StanfordArea5Dataset \
     --batch_size $BATCH_SIZE \
     --scheduler PolyLR \
