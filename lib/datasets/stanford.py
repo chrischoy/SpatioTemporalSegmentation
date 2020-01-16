@@ -4,11 +4,8 @@ import sys
 import numpy as np
 from collections import defaultdict
 from scipy import spatial
-from plyfile import PlyData, PlyElement
+from plyfile import PlyData
 
-import torch
-
-from lib.pc_utils import read_plyfile
 from lib.utils import read_txt, fast_hist, per_class_iu
 from lib.dataset import VoxelizationDataset, DatasetPhase, str2datasetphase_type, cache
 import lib.transforms as t

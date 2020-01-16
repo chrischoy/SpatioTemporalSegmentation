@@ -70,7 +70,7 @@ def main():
         DatasetClass,
         config,
         phase=config.train_phase,
-        threads=config.threads,
+        num_workers=config.num_workers,
         augment_data=True,
         shuffle=True,
         repeat=True,
@@ -80,7 +80,7 @@ def main():
     val_data_loader = initialize_data_loader(
         DatasetClass,
         config,
-        threads=config.val_threads,
+        num_workers=config.num_val_workers,
         phase=config.val_phase,
         augment_data=False,
         shuffle=True,
@@ -97,7 +97,7 @@ def main():
     test_data_loader = initialize_data_loader(
         DatasetClass,
         config,
-        threads=config.threads,
+        num_workers=config.num_workers,
         phase=config.test_phase,
         augment_data=False,
         shuffle=False,

@@ -11,7 +11,7 @@ from torch.utils.data import Dataset, DataLoader
 
 import MinkowskiEngine as ME
 
-from lib.pc_utils import read_plyfile
+from plyfile import PlyData
 import lib.transforms as t
 from lib.dataloader import InfSampler
 from lib.voxelizer import Voxelizer
@@ -173,7 +173,12 @@ class VoxelizationDatasetBase(DictDataset, ABC):
 
   def load_ply(self, index):
     filepath = self.data_root / self.data_paths[index]
-    return read_plyfile(filepath), None
+    plydata = PlyData.read(filepath)
+    data = plydata.elements[0].data
+    coords = np.array([data['x'], data['y'], data['z']], dtype=np.float32).T
+    feats = np.array([data['red'], data['green'], data['blue']], dtype=np.float32).T
+    labels = np.array(data['label'], dtype=np.int32)
+    return coords, feats, labels, None
 
   def __len__(self):
     num_data = len(self.data_paths)
@@ -412,7 +417,7 @@ class TemporalVoxelizationDataset(VoxelizationDataset):
 def initialize_data_loader(DatasetClass,
                            config,
                            phase,
-                           threads,
+                           num_workers,
                            shuffle,
                            repeat,
                            augment_data,
@@ -467,7 +472,7 @@ def initialize_data_loader(DatasetClass,
 
   data_args = {
       'dataset': dataset,
-      'num_workers': threads,
+      'num_workers': num_workers,
       'batch_size': batch_size,
       'collate_fn': collate_fn,
   }
