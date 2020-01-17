@@ -1,6 +1,50 @@
+[pypi-url]: https://pypi.org/project/MinkowskiEngine/
+
+
 # Spatio-Temporal Segmentation
 
 This repository contains the accompanying code for [4D-SpatioTemporal ConvNets: Minkowski Convolutional Neural Networks, CVPR'19](https://arxiv.org/abs/1904.08755).
+
+
+## Requirements
+
+- Ubuntu 14.04 or higher
+- CUDA 10.1 or higher
+- pytorch 1.3 or higher
+- python 3.6 or higher
+- GCC 6 or higher
+
+
+## Installation
+
+You need to install `pytorch` and [`Minkowski Engine`][pypi-url] either with `pip` or with anaconda.
+
+### Pip
+
+The MinkowskiEngine is distributed via [PyPI MinkowskiEngine][pypi-url] which can be installed simply with `pip`.
+First, install pytorch following the [instruction](https://pytorch.org). Next, install `openblas`.
+
+```
+sudo apt install openblas
+
+pip3 install torch torchvision
+
+pip3 install -U MinkowskiEngine
+```
+
+Next, clone the repository and install the rest of the requirements
+
+```
+git clone https://github.com/chrischoy/SpatioTemporalSegmentation/
+
+cd SpatioTemporalSegmentation
+
+pip install -r requirements.txt
+```
+
+### Troubleshooting
+
+Please visit the MinkowskiEngine [issue pages](https://github.com/StanfordVL/MinkowskiEngine/) if you have difficulties installing Minkowski Engine.
 
 
 ## ScanNet Training
