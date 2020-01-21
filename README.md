@@ -138,28 +138,19 @@ python -m lib.datasets.preprocessing.stanford
 | Mink16UNet34C | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU, no sliding window                                          | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
 | Mink16UNet34C | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU, no rotation average, no sliding window [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
 | Mink16UNet18  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.828% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/Gj3PrPFr) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18-stanford-conv1-5.pth) |
+| Mink16UNet34  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 66.348% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/WzhfGMQG) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34-stanford-conv1-5.pth) |
 
 Note that sliding window style evaluation (cropping and stitching results) used in many related works effectively works as an ensemble (rotation averaging) which boosts the performance.
 
 
 ## Demo
 
-The demo code will download the weights for ScanNet training split trained network Mink16UNet34C with conv1 kernel size 5 and visualize the prediction.
+The demo code will download weights and an example scene first and then visualize prediction results.
 
-```
-python -m demo.scannet
-```
-
-![](imgs/scannet.png)
-
-If you want to test a network trained on the Stanford dataset, run
-
-
-```
-python -m demo.stanford
-```
-
-![](imgs/stanford.png)
+| Dataset  | Scannet                  | Stanford                  |
+|:--------:|:------------------------:|:-------------------------:|
+| Command  | `python -m demo.scannet` | `python -m demo.stanford` |
+| Result   | ![](imgs/scannet.png)    | ![](imgs/stanford.png)    |
 
 
 ## Citing this work
