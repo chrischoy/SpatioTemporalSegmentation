@@ -133,12 +133,14 @@ python -m lib.datasets.preprocessing.stanford
 
 ## Model Zoo
 
-| Model         | Dataset             | Voxel Size | Conv1 Kernel Size | Performance              | Link   |
-|:-------------:|:-------------------:|:----------:|:-----------------:|:-------------------------------------------------------------------------------:|:------:|
-| Mink16UNet34C | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU, no sliding window                                          | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
-| Mink16UNet34C | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU, no rotation average, no sliding window [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
-| Mink16UNet18  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.828% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/Gj3PrPFr) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18-stanford-conv1-5.pth) |
-| Mink16UNet34  | Stanford Area5 train | 5cm       | 5                 | Area 5 test 66.348% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/WzhfGMQG) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34-stanford-conv1-5.pth) |
+| Model            | Dataset             | Voxel Size | Conv1 Kernel Size | Performance              | Link   |
+|:----------------:|:-------------------:|:----------:|:-----------------:|:-------------------------------------------------------------------------------:|:------:|
+| Mink16UNet34C    | ScanNet train + val | 2cm        | 3                 | Test set 73.6% mIoU, no sliding window                                          | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34C_ScanNet.pth) |
+| Mink16UNet34C    | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU, no rotation average, no sliding window [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
+| Mink16UNet18     | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.828% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/Gj3PrPFr) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18-stanford-conv1-5.pth) |
+| Mink16UNet34     | Stanford Area5 train | 5cm       | 5                 | Area 5 test 66.348% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/WzhfGMQG) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34-stanford-conv1-5.pth) |
+| 3D Mink16UNet14A | Synthia CVPR19 train | 15cm      | 3                 | CVPR19 test wo elastic distortion 81.903% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/hN88iQqa) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet14A-synthia-conv1-3.pth) |
+
 
 Note that sliding window style evaluation (cropping and stitching results) used in many related works effectively works as an ensemble (rotation averaging) which boosts the performance.
 

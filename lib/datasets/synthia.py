@@ -265,6 +265,10 @@ class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):
     return ptc, center
 
 
+class SynthiaCVPR10cmVoxelizationDataset(SynthiaVoxelizationDataset):
+  VOXEL_SIZE = 10
+
+
 class SynthiaCVPR15cmVoxelizationDataset(SynthiaVoxelizationDataset):
   pass
 

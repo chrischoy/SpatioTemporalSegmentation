@@ -33,3 +33,11 @@ python -m main \
     --train_limit_numpoints 1200000 \
     --train_phase train \
     $3 2>&1 | tee -a "$LOG"
+
+python -m main \
+    --log_dir $LOG_DIR \
+    --dataset $DATASET \
+    --model $MODEL \
+    --is_train False \
+    --weights $LOG_DIR/weights.pth \
+    $3 2>&1 | tee -a "$LOG"
