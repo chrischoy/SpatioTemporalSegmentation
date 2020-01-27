@@ -7,6 +7,7 @@ import pickle
 import numpy as np
 
 from collections import defaultdict
+from plyfile import PlyData
 
 from lib.pc_utils import Camera, read_plyfile
 from lib.dataset import DictDataset, VoxelizationDataset, TemporalVoxelizationDataset, \
@@ -111,8 +112,6 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
   VOXEL_SIZE = 15  # cm
 
   PREVOXELIZATION_VOXEL_SIZE = 7.5
-  # Elastic distortion, (granularity, magitude) pairs
-  ELASTIC_DISTORT_PARAMS = ((80, 300),)
 
   # Augmentation arguments
   ROTATION_AUGMENTATION_BOUND = ((0, 0), (-np.pi, np.pi), (0, 0))
@@ -157,6 +156,15 @@ class SynthiaVoxelizationDataset(VoxelizationDataset):
         augment_data=augment_data,
         elastic_distortion=elastic_distortion,
         config=config)
+
+  def load_ply(self, index):
+    filepath = self.data_root / self.data_paths[index]
+    plydata = PlyData.read(filepath)
+    data = plydata.elements[0].data
+    coords = np.array([data['x'], data['y'], data['z']], dtype=np.float32).T
+    feats = np.array([data['r'], data['g'], data['b']], dtype=np.float32).T
+    labels = np.array(data['l'], dtype=np.int32)
+    return coords, feats, labels, None
 
 
 class SynthiaTemporalVoxelizationDataset(TemporalVoxelizationDataset):

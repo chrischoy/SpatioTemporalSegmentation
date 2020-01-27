@@ -160,19 +160,6 @@ class StanfordArea5Dataset(StanfordDataset):
   }
 
 
-class StanfordArea53cmDataset(StanfordArea5Dataset):
-  CLIP_BOUND = 3.2
-  VOXEL_SIZE = 0.03
-
-
-class StanfordArea57d5cmDataset(StanfordArea5Dataset):
-  VOXEL_SIZE = 0.075
-
-
-class StanfordArea510cmDataset(StanfordArea5Dataset):
-  VOXEL_SIZE = 0.1
-
-
 def test(config):
   """Test point cloud data loader.
   """

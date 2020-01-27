@@ -129,7 +129,7 @@ class MeanField(HighDimensionalModel):
       # Pairwise potential
       out = self.convs[i].apply(out, self.conv.kernel, x.pixel_dist, self.conv.stride,
                                 self.conv.kernel_size, self.conv.dilation, self.region_type_,
-                                self.region_offset_, x.coords_key, x.coords_key, x.C)
+                                self.region_offset_, x.coords_key, x.coords_key, x.coords_man)
       # Add unary
       out += xf
 
@@ -137,7 +137,7 @@ class MeanField(HighDimensionalModel):
       # Map the CRF output to the origianl space
       out = SparseMM()(Variable(self.out_mapping), out)
 
-    return SparseTensor(out, coords_key=x.coords_key, coords_manager=x.C)
+    return SparseTensor(out, coords_key=x.coords_key, coords_manager=x.coords_man)
 
 
 class BilateralCRF(Wrapper):
