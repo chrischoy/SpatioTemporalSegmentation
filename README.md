@@ -139,7 +139,8 @@ python -m lib.datasets.preprocessing.stanford
 | Mink16UNet34C    | ScanNet train       | 2cm        | 5                 | Val 72.219% mIoU, no rotation average, no sliding window [per class performance](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/13) | [download](https://node1.chrischoy.org/data/publications/minknet/MinkUNet34C-train-conv1-5.pth) |
 | Mink16UNet18     | Stanford Area5 train | 5cm       | 5                 | Area 5 test 65.828% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/Gj3PrPFr) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18-stanford-conv1-5.pth) |
 | Mink16UNet34     | Stanford Area5 train | 5cm       | 5                 | Area 5 test 66.348% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/WzhfGMQG) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet34-stanford-conv1-5.pth) |
-| 3D Mink16UNet14A | Synthia CVPR19 train | 15cm      | 3                 | CVPR19 test wo elastic distortion 81.903% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/hN88iQqa) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet14A-synthia-conv1-3.pth) |
+| 3D Mink16UNet14A | Synthia CVPR19 train | 15cm      | 3                 | CVPR19 test 81.903% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/hN88iQqa) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet14A-synthia-conv1-3.pth) |
+| 3D Mink16UNet18  | Synthia CVPR19 train | 15cm      | 3                 | CVPR19 test 82.762% mIoU, no rotation average, no sliding window [per class performance](https://pastebin.com/zvt0yLFV) | [download](https://node1.chrischoy.org/data/publications/minknet/Mink16UNet18-synthia-conv1-3.pth) |
 
 
 Note that sliding window style evaluation (cropping and stitching results) used in many related works effectively works as an ensemble (rotation averaging) which boosts the performance.
@@ -170,3 +171,8 @@ If you use the Minkowski Engine, please cite:
   year={2019}
 }
 ```
+
+## Related projects
+
+- [Minkowski Engine, a neural network library for sparse tensors](https://github.com/StanfordVL/MinkowskiEngine)
+- [Fully Convolutional Geometric Features, ICCV'19, fast and accurate 3D features](https://github.com/chrischoy/FCGF)
