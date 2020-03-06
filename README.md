@@ -25,7 +25,7 @@ The MinkowskiEngine is distributed via [PyPI MinkowskiEngine][pypi-url] which ca
 First, install pytorch following the [instruction](https://pytorch.org). Next, install `openblas`.
 
 ```
-sudo apt install openblas
+sudo apt install libopenblas-dev
 
 pip3 install torch torchvision
 
