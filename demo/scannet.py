@@ -147,7 +147,7 @@ if __name__ == '__main__':
 
   # Create a point cloud file
   pred_pcd = o3d.geometry.PointCloud()
-  coordinates = soutput.C.numpy()[:, :3]  # last column is the batch index
+  coordinates = soutput.C.numpy()[:, 1:]  # first column is the batch index
   pred_pcd.points = o3d.utility.Vector3dVector(coordinates * config.voxel_size)
   pred_pcd.colors = o3d.utility.Vector3dVector(colors / 255)
 
