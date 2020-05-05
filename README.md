@@ -5,6 +5,9 @@
 
 This repository contains the accompanying code for [4D-SpatioTemporal ConvNets: Minkowski Convolutional Neural Networks, CVPR'19](https://arxiv.org/abs/1904.08755).
 
+## Change Logs
+
+- 2020-05-04: As pointed out by Thomas Chaton on [Issue#30](https://github.com/chrischoy/SpatioTemporalSegmentation/issues/30), I also found out that the training script contains bugs that models cannot reach the target performance described in the Model Zoo with the latest MinkowskiEngine. I am in the process of debugging the bugs, but I am having some difficulty finding the bugs. So, I created another git repo [SpatioTemporalSegmentation-ScanNet](https://github.com/chrischoy/SpatioTemporalSegmentation-ScanNet) from my other private repo that reaches the target performance. Please refer to the [SpatioTemporalSegmentation-ScanNet](https://github.com/chrischoy/SpatioTemporalSegmentation-ScanNet) for the ScanNet training. I'll update this repo once I find the bugs and merge SpatioTemporalSegmentation-ScanNet with this repo. Sorry for the trouble.
 
 ## Requirements
 
@@ -27,9 +30,9 @@ First, install pytorch following the [instruction](https://pytorch.org). Next, i
 ```
 sudo apt install libopenblas-dev
 
-pip3 install torch torchvision
+pip install torch torchvision
 
-pip3 install -U MinkowskiEngine
+pip install -U git+https://github.com/StanfordVL/MinkowskiEngine
 ```
 
 Next, clone the repository and install the rest of the requirements

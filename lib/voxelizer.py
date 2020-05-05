@@ -129,13 +129,6 @@ class Voxelizer:
     homo_coords = np.hstack((coords, np.ones((coords.shape[0], 1), dtype=coords.dtype)))
     coords_aug = np.floor(homo_coords @ rigid_transformation.T[:, :3])
 
-    # Align all coordinates to the origin.
-    min_coords = coords_aug.min(0)
-    M_t = np.eye(4)
-    M_t[:3, -1] = -min_coords
-    rigid_transformation = M_t @ rigid_transformation
-    coords_aug = np.floor(coords_aug - min_coords)
-
     # key = self.hash(coords_aug)  # floor happens by astype(np.uint64)
     coords_aug, feats, labels = ME.utils.sparse_quantize(
         coords_aug, feats, labels=labels, ignore_label=self.ignore_label)
