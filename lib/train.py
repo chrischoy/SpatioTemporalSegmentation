@@ -80,7 +80,7 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
         # Preprocess input
         color = input[:, :3].int()
         if config.normalize_color:
-          input[:, 1:] = input[:, 1:] / 255. - 0.5
+          input[:, :3] = input[:, :3] / 255. - 0.5
         sinput = SparseTensor(input, coords).to(device)
 
         data_time += data_timer.toc(False)
@@ -149,10 +149,6 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
 
         # Recover back
         model.train()
-
-      if curr_iter % config.empty_cache_freq == 0:
-        # Clear cache
-        torch.cuda.empty_cache()
 
       # End of iteration
       curr_iter += 1
