@@ -104,12 +104,12 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
         color = input[:, :3].int()
       if config.normalize_color:
         input[:, :3] = input[:, :3] / 255. - 0.5
-      sinput = SparseTensor(input, coords).to(device)
+      sinput = SparseTensor(input, coords, device=device)
 
       # Feed forward
       inputs = (sinput,) if config.wrapper_type == 'None' else (sinput, coords, color)
       soutput = model(*inputs)
-      output = soutput.F
+      output = soutput.slice(sinput)
 
       pred = get_prediction(dataset, output, target).int()
       iter_time = iter_timer.toc(False)
@@ -118,13 +118,7 @@ def test(model, data_loader, config, transform_data_fn=None, has_gt=True):
         save_predictions(coords, pred, transformation, dataset, config, iteration, save_pred_dir)
 
       if has_gt:
-        if config.evaluate_original_pointcloud:
-          raise NotImplementedError('pointcloud')
-          output, pred, target = permute_pointcloud(coords, pointcloud, transformation,
-                                                    dataset.label_map, output, pred)
-
         target_np = target.numpy()
-
         num_sample = target_np.shape[0]
 
         target = target.to(device)

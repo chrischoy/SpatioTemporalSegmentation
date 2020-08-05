@@ -66,7 +66,7 @@ python -m lib.datasets.preprocessing.scannet
 ```
 export BATCH_SIZE=N;
 ./scripts/train_scannet.sh 0 \
-	-default \
+	default \
 	"--scannet_path /path/to/preprocessed/scannet"
 ```
 
@@ -104,7 +104,7 @@ tar -xvjf *.tar.bz2
 ```
 export BATCH_SIZE=N; \
 ./scripts/train_synthia4d.sh 0 \
-	"-default" \
+	"default" \
 	"--synthia_path /path/to/extract/synthia4d"
 ```
 
@@ -131,7 +131,7 @@ python -m lib.datasets.preprocessing.stanford
 
 ```
 ./scripts/train_stanford.sh 0 \
-	"-default" \
+	"default" \
 	"--stanford3d_path /PATH/TO/PREPROCESSED/STANFORD"
 ```
 
