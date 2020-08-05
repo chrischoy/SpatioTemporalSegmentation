@@ -81,7 +81,7 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
         color = input[:, :3].int()
         if config.normalize_color:
           input[:, :3] = input[:, :3] / 255. - 0.5
-        sinput = SparseTensor(input, coords).to(device)
+        sinput = SparseTensor(input, coords, device=device)
 
         data_time += data_timer.toc(False)
 
@@ -91,8 +91,8 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
         soutput = model(*inputs)
         # The output of the network is not sorted
         target = target.long().to(device)
-
-        loss = criterion(soutput.F, target.long())
+        sliced_output = soutput.slice(sinput)
+        loss = criterion(sliced_output, target.long())
 
         # Compute and accumulate gradient
         loss /= config.iter_size
@@ -106,7 +106,7 @@ def train(model, data_loader, val_data_loader, config, transform_data_fn=None):
       data_time_avg.update(data_time)
       iter_time_avg.update(iter_timer.toc(False))
 
-      pred = get_prediction(data_loader.dataset, soutput.F, target)
+      pred = get_prediction(data_loader.dataset, sliced_output, target)
       score = precision_at_one(pred, target)
       losses.update(batch_loss, target.size(0))
       scores.update(score, target.size(0))

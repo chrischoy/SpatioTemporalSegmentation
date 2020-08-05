@@ -130,8 +130,8 @@ class Voxelizer:
     coords_aug = np.floor(homo_coords @ rigid_transformation.T[:, :3])
 
     # key = self.hash(coords_aug)  # floor happens by astype(np.uint64)
-    coords_aug, feats, labels = ME.utils.sparse_quantize(
-        coords_aug, feats, labels=labels, ignore_label=self.ignore_label)
+    # coords_aug, feats, labels = ME.utils.sparse_quantize(
+    #     coords_aug, feats, labels=labels, ignore_label=self.ignore_label)
 
     return coords_aug, feats, labels, rigid_transformation.flatten()
 
