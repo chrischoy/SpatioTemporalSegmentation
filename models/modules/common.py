@@ -58,7 +58,7 @@ conv_to_region_type = {
     ConvType.SPATIAL_HYPERCUBE_TEMPORAL_HYPERCROSS: ME.RegionType.HYBRID
 }
 
-int_to_region_type = {m.value: m for m in ME.RegionType}
+int_to_region_type = {m: ME.RegionType(m) for m in range(3)}
 
 
 def convert_region_type(region_type):
